@@ -49,7 +49,8 @@ platform :android do
 
     set_github_release(
       repository_name: repo,
-      api_token: token,
+      # Actions GITHUB_TOKEN needs Bearer auth (api_token → 404 "Not Found")
+      api_bearer: token,
       name: "FoodRush #{version_name}",
       tag_name: tag,
       description: changelog,
