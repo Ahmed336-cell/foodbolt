@@ -1,0 +1,117 @@
+# Build release APK with Flutter + Fastlane, then attach to a GitHub Release.
+#
+# Trigger:
+#   git tag v1.0.0 && git push origin v1.0.0
+#   or Actions → Android Release → Run workflow
+#
+# Optional repo secrets (baked into .env for the APK):
+#   SUPABASE_URL, SUPABASE_ANON_KEY, INVITE_BASE_URL, USE_MOCKS, BRANCH_KEY
+#
+# GITHUB_TOKEN is provided by Actions (contents: write).
+
+name: Android Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v1.0.1). Leave empty to use run id tag."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build APK & GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.tag }}" ]; then
+            TAG="${{ inputs.tag }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="v0.0.0-ci.${{ github.run_number }}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Using tag: ${TAG}"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Write .env for release build
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          BRANCH_KEY: ${{ secrets.BRANCH_KEY }}
+          INVITE_BASE_URL: ${{ secrets.INVITE_BASE_URL }}
+          USE_MOCKS: ${{ secrets.USE_MOCKS }}
+        run: |
+          {
+            echo "SUPABASE_URL=${SUPABASE_URL:-}"
+            echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}"
+            echo "BRANCH_KEY=${BRANCH_KEY:-}"
+            echo "INVITE_BASE_URL=${INVITE_BASE_URL:-foodrush://join}"
+            echo "USE_MOCKS=${USE_MOCKS:-true}"
+          } > .env
+          # Ensure asset exists even if secrets are empty (mock mode)
+          test -f .env
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Install Fastlane
+        working-directory: android
+        run: bundle install
+
+      - name: Build APK and publish GitHub Release (Fastlane)
+        working-directory: android
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+          GENERATE_RELEASE_NOTES: "true"
+        run: bundle exec fastlane android github_release tag:"${RELEASE_TAG}"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FoodRush-${{ steps.meta.outputs.tag }}
+          path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,2 @@
+# Package name — keep in sync with android/app/build.gradle.kts applicationId
+package_name("com.elm.foodbolt")

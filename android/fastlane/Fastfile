@@ -1,0 +1,63 @@
+# frozen_string_literal: true
+
+require "fileutils"
+
+opt_out_usage
+skip_docs
+
+default_platform(:android)
+
+platform :android do
+  before_all do
+    ENV["FASTLANE_SKIP_UPDATE_DOCS"] = "1"
+  end
+
+  desc "Build release APK with Flutter"
+  lane :build_apk do
+    root = File.expand_path("../..", __dir__)
+    Dir.chdir(root) do
+      sh("flutter", "pub", "get")
+      sh("flutter", "build", "apk", "--release")
+    end
+
+    apk = File.expand_path("../../build/app/outputs/flutter-apk/app-release.apk", __dir__)
+    UI.user_error!("APK not found at #{apk}") unless File.exist?(apk)
+    UI.success("APK ready: #{apk}")
+    apk
+  end
+
+  desc "Build APK and publish it to a GitHub Release"
+  lane :github_release do |options|
+    tag = options[:tag] || ENV["RELEASE_TAG"] || ENV["GITHUB_REF_NAME"]
+    UI.user_error!("Missing release tag (pass tag: or set RELEASE_TAG / GITHUB_REF_NAME)") if tag.to_s.empty?
+
+    repo = options[:repo] || ENV["GITHUB_REPOSITORY"]
+    UI.user_error!("Missing GITHUB_REPOSITORY (owner/repo)") if repo.to_s.empty?
+
+    token = ENV["GITHUB_TOKEN"] || ENV["GH_TOKEN"] || ENV["FL_GITHUB_RELEASE_API_TOKEN"]
+    UI.user_error!("Missing GITHUB_TOKEN") if token.to_s.empty?
+
+    version_name = tag.sub(/\Av/, "")
+    apk_path = build_apk
+
+    # Rename for clearer download asset
+    release_apk = File.join(File.dirname(apk_path), "FoodRush-#{version_name}.apk")
+    FileUtils.cp(apk_path, release_apk)
+
+    changelog = options[:changelog] || ENV["RELEASE_NOTES"] ||
+                "FoodRush #{version_name}\n\nAndroid release APK."
+
+    set_github_release(
+      repository_name: repo,
+      api_token: token,
+      name: "FoodRush #{version_name}",
+      tag_name: tag,
+      description: changelog,
+      commitish: ENV["GITHUB_SHA"] || "main",
+      upload_assets: [release_apk],
+      is_generate_release_notes: ENV["GENERATE_RELEASE_NOTES"] != "false"
+    )
+
+    UI.success("GitHub Release #{tag} published with #{File.basename(release_apk)}")
+  end
+end
