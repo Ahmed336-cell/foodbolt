@@ -145,7 +145,7 @@ Fastlane lane (from `android/`):
 
 ```bash
 cd android
-bundle install
+bundle install   # needs Ruby 3.x + Bundler 2.5 (not system macOS Ruby 2.6)
 GITHUB_TOKEN=… GITHUB_REPOSITORY=owner/repo RELEASE_TAG=v1.0.0 \
   bundle exec fastlane android github_release
 ```

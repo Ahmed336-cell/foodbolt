@@ -35,6 +35,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
+    defaults:
+      run:
+        working-directory: android
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +47,7 @@ jobs:
 
       - name: Resolve release tag
         id: meta
+        working-directory: .
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.tag }}" ]; then
             TAG="${{ inputs.tag }}"
@@ -67,9 +72,11 @@ jobs:
           cache: true
 
       - name: Flutter doctor
+        working-directory: .
         run: flutter doctor -v
 
       - name: Write .env for release build
+        working-directory: .
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -84,22 +91,24 @@ jobs:
             echo "INVITE_BASE_URL=${INVITE_BASE_URL:-foodrush://join}"
             echo "USE_MOCKS=${USE_MOCKS:-true}"
           } > .env
-          # Ensure asset exists even if secrets are empty (mock mode)
           test -f .env
 
-      - name: Set up Ruby
+      - name: Drop legacy Bundler lock (forces Bundler 2.5)
+        working-directory: android
+        run: |
+          # Old Gemfile.lock had BUNDLED WITH 1.17.2 — breaks Ruby 3.3 (untaint removed).
+          rm -f Gemfile.lock
+          echo "Gemfile.lock removed; setup-ruby will use Bundler ${BUNDLER_VERSION:-2.5.23}"
+
+      - name: Set up Ruby + Fastlane
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
+          bundler: "2.5.23"
           bundler-cache: true
           working-directory: android
 
-      - name: Install Fastlane
-        working-directory: android
-        run: bundle install
-
       - name: Build APK and publish GitHub Release (Fastlane)
-        working-directory: android
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
