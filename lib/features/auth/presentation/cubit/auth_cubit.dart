@@ -56,11 +56,13 @@ class AuthCubit extends Cubit<AuthState> {
     required RegisterUser registerUser,
     required ContinueAsGuest continueAsGuest,
     required LogoutUser logoutUser,
+    required DeleteAccount deleteAccount,
   })  : _getCurrentUser = getCurrentUser,
         _loginUser = loginUser,
         _registerUser = registerUser,
         _continueAsGuest = continueAsGuest,
         _logoutUser = logoutUser,
+        _deleteAccount = deleteAccount,
         super(const AuthState()) {
     _sub = authRepository.watchAuth().listen((user) {
       emit(state.copyWith(user: user, clearUser: user == null, initialized: true));
@@ -72,6 +74,7 @@ class AuthCubit extends Cubit<AuthState> {
   final RegisterUser _registerUser;
   final ContinueAsGuest _continueAsGuest;
   final LogoutUser _logoutUser;
+  final DeleteAccount _deleteAccount;
   late final StreamSubscription<AppUser?> _sub;
 
   Future<void> checkSession() async {
@@ -149,6 +152,28 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     await _logoutUser(const NoParams());
     emit(state.copyWith(clearUser: true, clearError: true));
+  }
+
+  Future<bool> deleteAccount() async {
+    emit(state.copyWith(loading: true, clearError: true, clearInfo: true));
+    final result = await _deleteAccount(const NoParams());
+    return result.fold(
+      (f) {
+        emit(state.copyWith(loading: false, error: f.message));
+        return false;
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            clearUser: true,
+            loading: false,
+            clearError: true,
+            info: 'Account deleted successfully.',
+          ),
+        );
+        return true;
+      },
+    );
   }
 
   @override

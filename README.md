@@ -152,3 +152,22 @@ GITHUB_TOKEN=… GITHUB_REPOSITORY=owner/repo RELEASE_TAG=v1.0.0 \
 
 Optional repo secrets for the baked `.env`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `USE_MOCKS`, `INVITE_BASE_URL`, `BRANCH_KEY`.
 
+## Android screenshots (Fastlane)
+
+Needs a running emulator or device:
+
+```bash
+flutter emulators --launch <emulator_id>
+# or plug in a phone with USB debugging
+
+cd android
+bundle install   # Ruby 3.x + Bundler 2.5
+bundle exec fastlane screenshots
+```
+
+Shots land in:
+- `android/fastlane/screenshots/`
+- `android/fastlane/metadata/android/<locale>/images/phoneScreenshots/`
+
+Suite: `integration_test/screenshots_test.dart` (onboarding, welcome, login, home, create room).
+

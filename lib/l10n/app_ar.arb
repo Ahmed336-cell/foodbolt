@@ -45,6 +45,11 @@
   "online": "متصل",
   "offline": "غير متصل",
   "logout": "تسجيل الخروج",
+  "deleteAccount": "حذف الحساب",
+  "deleteAccountTitle": "حذف الحساب؟",
+  "deleteAccountBody": "هذا الإجراء نهائي وسيحذف بيانات ملفك الشخصي.",
+  "deleteAccountConfirm": "حذف",
+  "accountDeleted": "تم حذف الحساب بنجاح.",
 
   "helloUser": "أهلًا، {name}",
   "@helloUser": { "placeholders": { "name": { "type": "String" } } },

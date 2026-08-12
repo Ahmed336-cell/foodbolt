@@ -150,6 +150,17 @@ class AuthSupabaseRepository implements AuthRepository {
     }
   }
 
+  @override
+  Future<Result<void>> deleteAccount() async {
+    try {
+      await _client.rpc('delete_my_account');
+      await _client.auth.signOut();
+      return const Success(null);
+    } catch (e, st) {
+      return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
   Future<AppUser?> _loadCurrent() async {
     final authUser = _client.auth.currentUser;
     if (authUser == null) return null;

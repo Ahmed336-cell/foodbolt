@@ -150,6 +150,7 @@ void _registerUseCasesAndCubits() {
   sl.registerLazySingleton(() => RegisterUser(sl()));
   sl.registerLazySingleton(() => ContinueAsGuest(sl()));
   sl.registerLazySingleton(() => LogoutUser(sl()));
+  sl.registerLazySingleton(() => DeleteAccount(sl()));
 
   sl.registerLazySingleton(() => CreateRoom(sl()));
   sl.registerLazySingleton(() => JoinRoom(sl()));
@@ -186,6 +187,7 @@ void _registerUseCasesAndCubits() {
       registerUser: sl(),
       continueAsGuest: sl(),
       logoutUser: sl(),
+      deleteAccount: sl(),
     ),
   );
   sl.registerLazySingleton(() => DeepLinkCubit(sl()));

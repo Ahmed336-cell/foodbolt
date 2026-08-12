@@ -135,6 +135,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Logout';
 
   @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountTitle => 'Delete account?';
+
+  @override
+  String get deleteAccountBody =>
+      'This action is permanent and will remove your profile data.';
+
+  @override
+  String get deleteAccountConfirm => 'Delete';
+
+  @override
+  String get accountDeleted => 'Account deleted successfully.';
+
+  @override
   String helloUser(String name) {
     return 'Hey, $name';
   }

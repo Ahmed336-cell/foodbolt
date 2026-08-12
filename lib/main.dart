@@ -27,14 +27,19 @@ Future<void> main() async {
 }
 
 class FoodRushApp extends StatefulWidget {
-  const FoodRushApp({super.key});
+  const FoodRushApp({super.key, this.initialLocation});
+
+  /// Override start route (used by screenshot / integration tests).
+  final String? initialLocation;
 
   @override
   State<FoodRushApp> createState() => _FoodRushAppState();
 }
 
 class _FoodRushAppState extends State<FoodRushApp> {
-  late final _router = createRouter();
+  late final _router = createRouter(
+    initialLocation: widget.initialLocation ?? '/splash',
+  );
 
   @override
   Widget build(BuildContext context) {

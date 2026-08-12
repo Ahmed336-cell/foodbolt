@@ -17,4 +17,5 @@ abstract class AuthRepository {
   });
   Future<Result<AppUser>> continueAsGuest({required String displayName});
   Future<Result<void>> logout();
+  Future<Result<void>> deleteAccount();
 }

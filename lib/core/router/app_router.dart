@@ -19,13 +19,13 @@ import '../../features/room/presentation/screens/room_session_screen.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../di/injection.dart';
 
-GoRouter createRouter() {
+GoRouter createRouter({String initialLocation = '/splash'}) {
   final authCubit = sl<AuthCubit>();
   final deepLinkCubit = sl<DeepLinkCubit>();
   final settingsCubit = sl<SettingsCubit>();
 
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: initialLocation,
     refreshListenable: Listenable.merge([
       GoRouterRefreshStream(authCubit.stream),
       GoRouterRefreshStream(settingsCubit.stream),

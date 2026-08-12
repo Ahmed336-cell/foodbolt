@@ -64,3 +64,11 @@ class LogoutUser extends UseCase<void, NoParams> {
   @override
   Future<Result<void>> call(NoParams params) => _repo.logout();
 }
+
+class DeleteAccount extends UseCase<void, NoParams> {
+  DeleteAccount(this._repo);
+  final AuthRepository _repo;
+
+  @override
+  Future<Result<void>> call(NoParams params) => _repo.deleteAccount();
+}

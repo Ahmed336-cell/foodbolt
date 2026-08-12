@@ -85,4 +85,15 @@ class AuthMockRepository implements AuthRepository {
     _store.setCurrentUser(null);
     return const Success(null);
   }
+
+  @override
+  Future<Result<void>> deleteAccount() async {
+    final user = _store.currentUser;
+    if (user == null) {
+      return const Failed(AuthFailure('Not signed in.'));
+    }
+    _store.users.remove(user.id);
+    _store.setCurrentUser(null);
+    return const Success(null);
+  }
 }

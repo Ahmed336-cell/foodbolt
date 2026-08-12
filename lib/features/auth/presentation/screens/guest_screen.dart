@@ -126,7 +126,7 @@ class _GuestScreenState extends State<GuestScreen> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _continue(),
                 ),
-                const Spacer(),
+                const SizedBox(height: 24),
                 PrimaryButton(
                   label: fromInvite ? l10n.joinRoom : l10n.continueLabel,
                   loading: state.loading,

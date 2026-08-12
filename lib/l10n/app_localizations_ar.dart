@@ -135,6 +135,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get logout => 'تسجيل الخروج';
 
   @override
+  String get deleteAccount => 'حذف الحساب';
+
+  @override
+  String get deleteAccountTitle => 'حذف الحساب؟';
+
+  @override
+  String get deleteAccountBody =>
+      'هذا الإجراء نهائي وسيحذف بيانات ملفك الشخصي.';
+
+  @override
+  String get deleteAccountConfirm => 'حذف';
+
+  @override
+  String get accountDeleted => 'تم حذف الحساب بنجاح.';
+
+  @override
   String helloUser(String name) {
     return 'أهلًا، $name';
   }

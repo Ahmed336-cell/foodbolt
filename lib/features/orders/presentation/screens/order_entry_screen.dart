@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
 import '../../../../core/widgets/numeric_input.dart';
@@ -337,22 +338,12 @@ class _MiniGroupOrders extends StatelessWidget {
               label: l10n.lockOrders,
               loading: state.loading,
               onPressed: () async {
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: Text(l10n.lockOrdersQuestion),
-                    content: Text(l10n.lockOrdersBody),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: Text(l10n.cancel),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: Text(l10n.lock),
-                      ),
-                    ],
-                  ),
+                final ok = await showAppConfirmDialog(
+                  context,
+                  title: l10n.lockOrdersQuestion,
+                  message: l10n.lockOrdersBody,
+                  confirmLabel: l10n.lock,
+                  icon: Icons.lock_outline_rounded,
                 );
                 if (ok == true && context.mounted) {
                   Navigator.pop(context);

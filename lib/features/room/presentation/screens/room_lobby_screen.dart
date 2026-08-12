@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
@@ -123,26 +124,14 @@ class RoomLobbyScreen extends StatelessWidget {
                     label: l10n.start,
                     loading: state.loading,
                     onPressed: () async {
-                      final confirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: Text(l10n.startGameQuestion),
-                          content: Text(
-                            readyCount < 2
-                                ? l10n.startAnyway(readyCount)
-                                : l10n.playersReady(readyCount),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx, false),
-                              child: Text(l10n.cancel),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx, true),
-                              child: Text(l10n.start),
-                            ),
-                          ],
-                        ),
+                      final confirmed = await showAppConfirmDialog(
+                        context,
+                        title: l10n.startGameQuestion,
+                        message: readyCount < 2
+                            ? l10n.startAnyway(readyCount)
+                            : l10n.playersReady(readyCount),
+                        confirmLabel: l10n.start,
+                        icon: Icons.play_arrow_rounded,
                       );
                       if (confirmed == true && context.mounted) {
                         await context.read<RoomCubit>().startGame();

@@ -46,7 +46,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                     textDirection: TextDirection.ltr,
                     decoration: InputDecoration(hintText: l10n.roomCodeHint),
                   ),
-                  const Spacer(),
+                  const SizedBox(height: 24),
                   PrimaryButton(
                     label: l10n.joinRoom,
                     loading: state.loading,

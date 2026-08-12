@@ -12,18 +12,84 @@ platform :android do
     ENV["FASTLANE_SKIP_UPDATE_DOCS"] = "1"
   end
 
+  def project_root
+    File.expand_path("../..", __dir__)
+  end
+
+  def ensure_android_device!
+    devices = `adb devices`.lines
+      .map(&:strip)
+      .select { |l| l.end_with?("device") }
+      .map { |l| l.split("\t").first }
+    UI.user_error!(
+      "No Android device/emulator. Start one, then re-run:\n  flutter emulators --launch <id>"
+    ) if devices.empty?
+    devices.first
+  end
+
+  def collect_screenshots!(_device_id)
+    root = project_root
+    raw_dir = File.join(root, "build", "screenshots_raw")
+    UI.user_error!("No screenshots in #{raw_dir}") unless Dir.exist?(raw_dir)
+
+    pngs = Dir[File.join(raw_dir, "**", "*.png")]
+    UI.user_error!("No PNG files in #{raw_dir}") if pngs.empty?
+
+    %w[en-US ar].each do |locale|
+      dest = File.join(
+        __dir__,
+        "metadata",
+        "android",
+        locale,
+        "images",
+        "phoneScreenshots"
+      )
+      FileUtils.mkdir_p(dest)
+      pngs.each { |png| FileUtils.cp(png, File.join(dest, File.basename(png))) }
+    end
+
+    gallery = File.join(__dir__, "screenshots")
+    FileUtils.mkdir_p(gallery)
+    pngs.each { |png| FileUtils.cp(png, File.join(gallery, File.basename(png))) }
+
+    UI.success("Saved #{pngs.size} screenshot(s) → android/fastlane/screenshots/")
+  end
+
   desc "Build release APK with Flutter"
   lane :build_apk do
-    root = File.expand_path("../..", __dir__)
-    Dir.chdir(root) do
+    Dir.chdir(project_root) do
       sh("flutter", "pub", "get")
       sh("flutter", "build", "apk", "--release")
     end
 
-    apk = File.expand_path("../../build/app/outputs/flutter-apk/app-release.apk", __dir__)
+    apk = File.join(project_root, "build/app/outputs/flutter-apk/app-release.apk")
     UI.user_error!("APK not found at #{apk}") unless File.exist?(apk)
     UI.success("APK ready: #{apk}")
     apk
+  end
+
+  desc "Capture store screenshots via Flutter integration_test + device"
+  lane :screenshots do |options|
+    device_id = options[:device] || ENV["SCREENSHOT_DEVICE"] || ensure_android_device!
+    locale = options[:locale] || ENV["SCREENSHOT_LOCALE"] || "en-US"
+
+    UI.message("Capturing screenshots on #{device_id} (locale=#{locale})")
+
+    Dir.chdir(project_root) do
+      sh("flutter", "pub", "get")
+      FileUtils.rm_rf("build/screenshots_raw")
+      FileUtils.mkdir_p("build/screenshots_raw")
+
+      sh(
+        "flutter", "drive",
+        "--driver=test_driver/integration_test.dart",
+        "--target=integration_test/screenshots_test.dart",
+        "-d", device_id,
+        "--dart-define=SCREENSHOTS=true"
+      )
+    end
+
+    collect_screenshots!(device_id)
   end
 
   desc "Build APK and publish it to a GitHub Release"

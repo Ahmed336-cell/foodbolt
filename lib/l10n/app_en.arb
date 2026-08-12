@@ -45,6 +45,11 @@
   "online": "Online",
   "offline": "Offline",
   "logout": "Logout",
+  "deleteAccount": "Delete account",
+  "deleteAccountTitle": "Delete account?",
+  "deleteAccountBody": "This action is permanent and will remove your profile data.",
+  "deleteAccountConfirm": "Delete",
+  "accountDeleted": "Account deleted successfully.",
 
   "helloUser": "Hey, {name}",
   "@helloUser": { "placeholders": { "name": { "type": "String" } } },
