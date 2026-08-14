@@ -74,12 +74,20 @@
   "hostPickWinner": "Pick as winner",
 
   "enterRoomCode": "Enter the room code",
-  "roomCodeHint": "ABC123",
+  "roomCodeHint": "6 characters · CAPITAL letters & numbers",
+  "roomCodeLabel": "Room code",
+  "tapCodeToCopy": "Tap code to copy",
   "codeCopied": "Code copied",
   "roomCode": "Code {code}",
   "@roomCode": { "placeholders": { "code": { "type": "String" } } },
 
   "inviteFriends": "Invite Friends",
+  "leaveRoom": "Leave room",
+  "leaveRoomTitle": "Leave room?",
+  "leaveRoomBody": "You will leave this room. You can join again with the code if it is still open.",
+  "cancelRoom": "Cancel room",
+  "cancelRoomTitle": "Cancel room?",
+  "cancelRoomBody": "This ends the room for everyone. Friends will no longer be able to join.",
   "playersReady": "{count} players are ready",
   "@playersReady": { "placeholders": { "count": { "type": "int" } } },
   "waitingForFriends": "Waiting for friends…",
@@ -206,9 +214,30 @@
   "@ordersSubmitted": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
   "lockOrders": "Lock Orders",
   "lockOrdersQuestion": "Lock orders?",
-  "lockOrdersBody": "After locking, participants cannot edit their orders.",
+  "lockOrdersBody": "After locking, participants cannot edit. You will see the combined order to send to the restaurant.",
   "submitted": "Submitted",
   "notSubmitted": "Not submitted",
+  "orderDetailsTitle": "Order for restaurant",
+  "orderDetailsPrompt": "Send this order to the restaurant (WhatsApp, call, or delivery app).",
+  "combinedOrder": "Combined order",
+  "combinedOrderHint": "Same items from different people are merged into one line.",
+  "sharedBy": "Shared by {people}",
+  "@sharedBy": {
+    "placeholders": {
+      "people": { "type": "String" }
+    }
+  },
+  "orderedBy": "Ordered by {people}",
+  "@orderedBy": {
+    "placeholders": {
+      "people": { "type": "String" }
+    }
+  },
+  "perPersonOrders": "Per person",
+  "shareWithRestaurant": "Share",
+  "orderDetailsCopied": "Order copied — paste to the restaurant.",
+  "continueToReceipt": "Continue to receipt",
+  "waitingHostReceipt": "Waiting for host to continue…",
 
   "uploadReceiptTitle": "Upload receipt",
   "uploadReceiptPrompt": "Upload the receipt",

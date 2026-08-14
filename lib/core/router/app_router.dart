@@ -45,7 +45,8 @@ GoRouter createRouter({String initialLocation = '/splash'}) {
 
       final loggedIn = auth.isAuthenticated;
       final pending = deepLinkCubit.state.pendingRoomId;
-      final onAuthGate = loc == '/welcome' ||
+      final onAuthGate =
+          loc == '/welcome' ||
           loc == '/login' ||
           loc == '/guest' ||
           loc == '/splash';
@@ -64,19 +65,26 @@ GoRouter createRouter({String initialLocation = '/splash'}) {
       }
 
       if (!loggedIn && !onAuthGate) return '/welcome';
-      if (loggedIn && (loc == '/welcome' || loc == '/login' || loc == '/guest')) {
+      if (loggedIn &&
+          (loc == '/welcome' || loc == '/login' || loc == '/guest')) {
         return '/home';
       }
       return null;
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
-      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+      GoRoute(
+        path: '/onboarding',
+        builder: (_, __) => const OnboardingScreen(),
+      ),
       GoRoute(path: '/welcome', builder: (_, __) => const WelcomeScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/guest', builder: (_, __) => const GuestScreen()),
       GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
-      GoRoute(path: '/create-room', builder: (_, __) => const CreateRoomScreen()),
+      GoRoute(
+        path: '/create-room',
+        builder: (_, __) => const CreateRoomScreen(),
+      ),
       GoRoute(path: '/join-room', builder: (_, __) => const JoinRoomScreen()),
       GoRoute(path: '/history', builder: (_, __) => const HistoryScreen()),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),

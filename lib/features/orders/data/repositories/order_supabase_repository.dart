@@ -171,12 +171,6 @@ class OrderSupabaseRepository implements OrderRepository {
         'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.ordersLocked),
       }).eq('id', roomId);
 
-      await Future<void>.delayed(const Duration(milliseconds: 100));
-
-      await _client.from('rooms').update({
-        'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.receipt),
-      }).eq('id', roomId);
-
       return const Success(null);
     } catch (e, st) {
       return Failed(SupabaseMappers.mapError(e, st));

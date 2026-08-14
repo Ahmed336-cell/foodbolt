@@ -215,7 +215,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterRoomCode => 'أدخل كود الغرفة';
 
   @override
-  String get roomCodeHint => 'ABC123';
+  String get roomCodeHint => '6 خانات · حروف وأرقام كبيرة';
+
+  @override
+  String get roomCodeLabel => 'كود الغرفة';
+
+  @override
+  String get tapCodeToCopy => 'اضغط على الكود للنسخ';
 
   @override
   String get codeCopied => 'تم نسخ الكود';
@@ -227,6 +233,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get inviteFriends => 'ادعُ أصحابك';
+
+  @override
+  String get leaveRoom => 'مغادرة الغرفة';
+
+  @override
+  String get leaveRoomTitle => 'مغادرة الغرفة؟';
+
+  @override
+  String get leaveRoomBody =>
+      'هتغادر الغرفة. تقدر تدخل تاني بالكود لو لسه مفتوحة.';
+
+  @override
+  String get cancelRoom => 'إلغاء الغرفة';
+
+  @override
+  String get cancelRoomTitle => 'إلغاء الغرفة؟';
+
+  @override
+  String get cancelRoomBody =>
+      'هتنتهي الغرفة للجميع. أصحابك مش هيقدروا يدخلوا بعد كده.';
 
   @override
   String playersReady(int count) {
@@ -578,13 +604,53 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lockOrdersQuestion => 'إغلاق الطلبات؟';
 
   @override
-  String get lockOrdersBody => 'بعد الإغلاق لا يمكن للمشاركين تعديل طلباتهم.';
+  String get lockOrdersBody =>
+      'بعد الإغلاق لا يمكن للمشاركين التعديل. ستظهر الطلبات المجمّعة لإرسالها للمطعم.';
 
   @override
   String get submitted => 'تم الإرسال';
 
   @override
   String get notSubmitted => 'لم يُرسل';
+
+  @override
+  String get orderDetailsTitle => 'طلب المطعم';
+
+  @override
+  String get orderDetailsPrompt =>
+      'أرسل هذا الطلب للمطعم (واتساب، اتصال، أو تطبيق توصيل).';
+
+  @override
+  String get combinedOrder => 'الطلب المجمّع';
+
+  @override
+  String get combinedOrderHint =>
+      'نفس الأصناف من أشخاص مختلفين تُدمَج في سطر واحد.';
+
+  @override
+  String sharedBy(String people) {
+    return 'مشترك: $people';
+  }
+
+  @override
+  String orderedBy(String people) {
+    return 'طلبه: $people';
+  }
+
+  @override
+  String get perPersonOrders => 'حسب الشخص';
+
+  @override
+  String get shareWithRestaurant => 'مشاركة';
+
+  @override
+  String get orderDetailsCopied => 'تم نسخ الطلب — الصقه للمطعم.';
+
+  @override
+  String get continueToReceipt => 'المتابعة للإيصال';
+
+  @override
+  String get waitingHostReceipt => 'في انتظار متابعة المضيف…';
 
   @override
   String get uploadReceiptTitle => 'رفع الإيصال';

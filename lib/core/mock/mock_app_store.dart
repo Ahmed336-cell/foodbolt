@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/error/failures.dart';
 import '../../core/phase/room_phase.dart';
+import '../../core/room/room_code.dart';
 import '../../core/usecase/usecase.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/cost_sharing/domain/entities/cost_share.dart';
@@ -112,8 +113,11 @@ class MockAppStore {
   }
 
   String generateCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    return List.generate(6, (_) => chars[_rand.nextInt(chars.length)]).join();
+    const chars = RoomCode.alphabet;
+    return List.generate(
+      RoomCode.length,
+      (_) => chars[_rand.nextInt(chars.length)],
+    ).join();
   }
 
   String funRoomName() {

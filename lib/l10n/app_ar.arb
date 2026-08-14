@@ -74,12 +74,20 @@
   "hostPickWinner": "اختيار كفائز",
 
   "enterRoomCode": "أدخل كود الغرفة",
-  "roomCodeHint": "ABC123",
+  "roomCodeHint": "6 خانات · حروف وأرقام كبيرة",
+  "roomCodeLabel": "كود الغرفة",
+  "tapCodeToCopy": "اضغط على الكود للنسخ",
   "codeCopied": "تم نسخ الكود",
   "roomCode": "كود {code}",
   "@roomCode": { "placeholders": { "code": { "type": "String" } } },
 
   "inviteFriends": "ادعُ أصحابك",
+  "leaveRoom": "مغادرة الغرفة",
+  "leaveRoomTitle": "مغادرة الغرفة؟",
+  "leaveRoomBody": "هتغادر الغرفة. تقدر تدخل تاني بالكود لو لسه مفتوحة.",
+  "cancelRoom": "إلغاء الغرفة",
+  "cancelRoomTitle": "إلغاء الغرفة؟",
+  "cancelRoomBody": "هتنتهي الغرفة للجميع. أصحابك مش هيقدروا يدخلوا بعد كده.",
   "playersReady": "{count} لاعبين جاهزون",
   "@playersReady": { "placeholders": { "count": { "type": "int" } } },
   "waitingForFriends": "في انتظار الأصدقاء…",
@@ -206,9 +214,30 @@
   "@ordersSubmitted": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
   "lockOrders": "إغلاق الطلبات",
   "lockOrdersQuestion": "إغلاق الطلبات؟",
-  "lockOrdersBody": "بعد الإغلاق لا يمكن للمشاركين تعديل طلباتهم.",
+  "lockOrdersBody": "بعد الإغلاق لا يمكن للمشاركين التعديل. ستظهر الطلبات المجمّعة لإرسالها للمطعم.",
   "submitted": "تم الإرسال",
   "notSubmitted": "لم يُرسل",
+  "orderDetailsTitle": "طلب المطعم",
+  "orderDetailsPrompt": "أرسل هذا الطلب للمطعم (واتساب، اتصال، أو تطبيق توصيل).",
+  "combinedOrder": "الطلب المجمّع",
+  "combinedOrderHint": "نفس الأصناف من أشخاص مختلفين تُدمَج في سطر واحد.",
+  "sharedBy": "مشترك: {people}",
+  "@sharedBy": {
+    "placeholders": {
+      "people": { "type": "String" }
+    }
+  },
+  "orderedBy": "طلبه: {people}",
+  "@orderedBy": {
+    "placeholders": {
+      "people": { "type": "String" }
+    }
+  },
+  "perPersonOrders": "حسب الشخص",
+  "shareWithRestaurant": "مشاركة",
+  "orderDetailsCopied": "تم نسخ الطلب — الصقه للمطعم.",
+  "continueToReceipt": "المتابعة للإيصال",
+  "waitingHostReceipt": "في انتظار متابعة المضيف…",
 
   "uploadReceiptTitle": "رفع الإيصال",
   "uploadReceiptPrompt": "ارفع الإيصال",

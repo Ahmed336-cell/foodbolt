@@ -28,7 +28,7 @@ class LanguageSwitch extends StatelessWidget {
           isArabic ? 'EN' : 'العربية',
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
-        style: TextButton.styleFrom(foregroundColor: Colors.white),
+        style: TextButton.styleFrom(foregroundColor: Colors.black),
       );
     }
 

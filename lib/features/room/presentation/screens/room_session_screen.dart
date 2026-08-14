@@ -11,8 +11,8 @@ import '../../../cost_sharing/presentation/cubit/cost_sharing_cubit.dart';
 import '../../../cost_sharing/presentation/screens/cost_sharing_review_screen.dart';
 import '../../../deep_link/presentation/cubit/deep_link_cubit.dart';
 import '../../../orders/presentation/cubit/order_cubit.dart';
-import '../../../orders/presentation/screens/group_orders_screen.dart';
 import '../../../orders/presentation/screens/order_entry_screen.dart';
+import '../../../orders/presentation/screens/restaurant_order_details_screen.dart';
 import '../../../orders/presentation/screens/restaurant_selected_screen.dart';
 import '../../../payment_summary/presentation/cubit/payment_summary_cubit.dart';
 import '../../../payment_summary/presentation/screens/payment_summary_screen.dart';
@@ -149,7 +149,7 @@ class _RoomSessionScreenState extends State<RoomSessionScreen> {
             RoomPhase.race => const RestaurantRaceScreen(),
             RoomPhase.restaurantSelected => const RestaurantSelectedScreen(),
             RoomPhase.ordering => const OrderEntryScreen(),
-            RoomPhase.ordersLocked => const GroupOrdersScreen(),
+            RoomPhase.ordersLocked => const RestaurantOrderDetailsScreen(),
             RoomPhase.receipt => const ReceiptUploadScreen(),
             RoomPhase.costReview => const CostSharingReviewScreen(),
             RoomPhase.paymentSummary => const PaymentSummaryScreen(),

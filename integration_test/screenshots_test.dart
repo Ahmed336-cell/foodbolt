@@ -16,12 +16,8 @@ Future<void> main() async {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
     try {
-      await dotenv.load(fileName: '.env');
-    } catch (_) {
-      try {
-        await dotenv.load(fileName: '.env.example');
-      } catch (_) {}
-    }
+      await dotenv.load(fileName: 'assets/env/.env');
+    } catch (_) {}
     dotenv.env['USE_MOCKS'] = 'true';
     if (sl.isRegistered<AuthCubit>()) {
       await sl.reset(dispose: true);

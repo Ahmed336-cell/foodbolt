@@ -89,6 +89,14 @@ class GetInviteLink extends UseCase<String, String> {
   Future<Result<String>> call(String roomId) => _repo.getInviteLink(roomId);
 }
 
+class LeaveRoom extends UseCase<void, String> {
+  LeaveRoom(this._repo);
+  final RoomRepository _repo;
+
+  @override
+  Future<Result<void>> call(String roomId) => _repo.leaveRoom(roomId);
+}
+
 class GetRoomHistory extends UseCase<List<Room>, NoParams> {
   GetRoomHistory(this._repo);
   final RoomRepository _repo;

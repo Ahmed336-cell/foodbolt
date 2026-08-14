@@ -18,32 +18,29 @@ class WelcomeScreen extends StatelessWidget {
 
     final brandHeader = Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.bolt_rounded, size: 34, color: AppTheme.primary),
-            const SizedBox(width: 6),
-            Text(
-              l10n.appName,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    fontSize: context.responsiveValue(
-                      phone: 24.0,
-                      tablet: 28.0,
-                      desktop: 32.0,
-                    ),
-                  ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: ColoredBox(
+            color: Colors.black,
+            child: Image.asset(
+              AppAssets.logo,
+              height: context.responsiveValue(
+                phone: 96.0,
+                tablet: 120.0,
+                desktop: 140.0,
+              ),
+              filterQuality: FilterQuality.high,
             ),
-          ],
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           l10n.tagline,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppTheme.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
+            color: AppTheme.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );

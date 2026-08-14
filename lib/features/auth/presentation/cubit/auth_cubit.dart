@@ -157,23 +157,21 @@ class AuthCubit extends Cubit<AuthState> {
   Future<bool> deleteAccount() async {
     emit(state.copyWith(loading: true, clearError: true, clearInfo: true));
     final result = await _deleteAccount(const NoParams());
-    return result.fold(
-      (f) {
-        emit(state.copyWith(loading: false, error: f.message));
-        return false;
-      },
-      (_) {
-        emit(
-          state.copyWith(
-            clearUser: true,
-            loading: false,
-            clearError: true,
-            info: 'Account deleted successfully.',
-          ),
-        );
-        return true;
-      },
+    if (result case Failed(:final failure)) {
+      emit(state.copyWith(loading: false, error: failure.message));
+      return false;
+    }
+    // Always finish logged out (clears any leftover session).
+    await _logoutUser(const NoParams());
+    emit(
+      state.copyWith(
+        clearUser: true,
+        loading: false,
+        clearError: true,
+        info: 'Account deleted successfully.',
+      ),
     );
+    return true;
   }
 
   @override

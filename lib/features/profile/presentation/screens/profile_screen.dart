@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_page.dart';
@@ -25,10 +24,15 @@ class ProfileScreen extends StatelessWidget {
     final ok = await context.read<AuthCubit>().deleteAccount();
     if (!context.mounted) return;
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.accountDeleted)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.accountDeleted)));
       context.go('/welcome');
+      return;
+    }
+    final error = context.read<AuthCubit>().state.error;
+    if (error != null && error.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 
@@ -46,7 +50,11 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AvatarCircle(name: user.displayName, color: user.avatarColor, size: 84),
+            AvatarCircle(
+              name: user.displayName,
+              color: user.avatarColor,
+              size: 84,
+            ),
             const SizedBox(height: 16),
             Text(
               user.displayName,
@@ -55,8 +63,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             if (user.email != null)
               Text(user.email!, textAlign: TextAlign.center),
-            if (user.isGuest)
-              Center(child: Chip(label: Text(l10n.guest))),
+            if (user.isGuest) Center(child: Chip(label: Text(l10n.guest))),
             const SizedBox(height: 28),
             const LanguageSwitch(),
             const Spacer(),

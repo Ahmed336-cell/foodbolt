@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -65,14 +66,44 @@ final sl = GetIt.instance;
 
 Future<void> configureDependencies({bool? useMocks}) async {
   var mocks = useMocks ?? AppEnv.useMocks;
+  AppEnv.liveBackendRequestedButUnavailable = false;
+  AppEnv.backendError = null;
 
   if (!mocks) {
-    final ready = await SupabaseBootstrap.init();
-    if (!ready) {
-      // Fall back to mocks if credentials missing so the app still runs.
-      mocks = true;
+    if (!AppEnv.hasSupabaseCredentials) {
+      AppEnv.liveBackendRequestedButUnavailable = true;
+      AppEnv.backendError =
+          'USE_MOCKS=false but SUPABASE_URL / SUPABASE_ANON_KEY missing. '
+          'Copy secrets into assets/env/.env (and root .env), then full restart '
+          '(flutter clean && flutter run).';
+      debugPrint('Supabase: ${AppEnv.backendError}');
+      // Do NOT silent-fallback to mocks — that creates rooms only in memory.
+      throw StateError(AppEnv.backendError!);
+    }
+    try {
+      final ready = await SupabaseBootstrap.init();
+      if (!ready) {
+        AppEnv.liveBackendRequestedButUnavailable = true;
+        AppEnv.backendError =
+            'Supabase init failed. Check SUPABASE_URL / SUPABASE_ANON_KEY.';
+        debugPrint('Supabase: ${AppEnv.backendError}');
+        throw StateError(AppEnv.backendError!);
+      }
+    } catch (e, st) {
+      if (e is StateError && AppEnv.backendError != null) rethrow;
+      AppEnv.liveBackendRequestedButUnavailable = true;
+      AppEnv.backendError = 'Supabase init error: $e';
+      debugPrint('Supabase: init exception\n$e\n$st');
+      throw StateError(AppEnv.backendError!);
     }
   }
+
+  AppEnv.usingMocks = mocks;
+  debugPrint(
+    mocks
+        ? 'Backend: MOCKS (in-memory — rooms not in Supabase)'
+        : 'Backend: LIVE Supabase',
+  );
 
   if (sl.isRegistered<MockAppStore>() || sl.isRegistered<AuthRepository>()) {
     await sl.reset();
@@ -159,6 +190,7 @@ void _registerUseCasesAndCubits() {
   sl.registerLazySingleton(() => SetRoomPhase(sl()));
   sl.registerLazySingleton(() => SetRoomSelectionMode(sl()));
   sl.registerLazySingleton(() => GetInviteLink(sl()));
+  sl.registerLazySingleton(() => LeaveRoom(sl()));
   sl.registerLazySingleton(() => GetRoomHistory(sl()));
 
   sl.registerLazySingleton(() => AddRestaurantSuggestion(sl()));
@@ -212,6 +244,7 @@ void _registerUseCasesAndCubits() {
       setRoomPhase: sl(),
       setRoomSelectionMode: sl(),
       getInviteLink: sl(),
+      leaveRoom: sl(),
     ),
   );
   sl.registerFactory(

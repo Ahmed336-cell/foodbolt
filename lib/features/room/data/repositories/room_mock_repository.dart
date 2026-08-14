@@ -2,6 +2,7 @@ import '../../../../core/deep_link/invite_links.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/mock/mock_app_store.dart';
 import '../../../../core/phase/room_phase.dart';
+import '../../../../core/room/room_code.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../../auth/domain/entities/app_user.dart';
 import '../../domain/entities/room.dart';
@@ -60,8 +61,13 @@ class RoomMockRepository implements RoomRepository {
     if (userResult case Failed(:final failure)) return Failed(failure);
     final user = userResult.dataOrNull!;
 
+    final normalized = RoomCode.extract(code);
+    if (!RoomCode.isComplete(normalized)) {
+      return const Failed(NotFoundFailure('Invalid room code.'));
+    }
+
     final room = _store.rooms.values
-        .where((r) => r.code.toUpperCase() == code.trim().toUpperCase())
+        .where((r) => RoomCode.normalize(r.code) == normalized)
         .firstOrNull;
     if (room == null) {
       return const Failed(NotFoundFailure('Invalid room code.'));

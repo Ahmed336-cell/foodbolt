@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/error/failures.dart';
@@ -153,11 +154,22 @@ class AuthSupabaseRepository implements AuthRepository {
   @override
   Future<Result<void>> deleteAccount() async {
     try {
+      // SQL RPC is the supported path. Edge function is optional.
       await _client.rpc('delete_my_account');
-      await _client.auth.signOut();
+      await _safeSignOut();
       return const Success(null);
     } catch (e, st) {
+      debugPrint('deleteAccount failed: $e\n$st');
+      // Keep session on failure so user sees the real error.
       return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
+  Future<void> _safeSignOut() async {
+    try {
+      await _client.auth.signOut();
+    } catch (_) {
+      // Account may already be gone — local session clear is enough.
     }
   }
 

@@ -1,10 +1,12 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/deep_link/invite_links.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/phase/room_phase.dart';
+import '../../../../core/room/room_code.dart';
 import '../../../../core/supabase/supabase_mappers.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/room.dart';
@@ -47,6 +49,7 @@ class RoomSupabaseRepository implements RoomRepository {
           .single();
 
       final roomId = inserted['id'] as String;
+      debugPrint('createRoom OK id=$roomId code=$code');
       final inviteUrl = InviteLinks.forToken(code);
       await _client.from('rooms').update({'invite_url': inviteUrl}).eq('id', roomId);
 
@@ -59,6 +62,7 @@ class RoomSupabaseRepository implements RoomRepository {
 
       return Success(_mapRoom({...inserted, 'invite_url': inviteUrl}));
     } catch (e, st) {
+      debugPrint('createRoom failed: $e\n$st');
       return Failed(SupabaseMappers.mapError(e, st));
     }
   }
@@ -69,10 +73,14 @@ class RoomSupabaseRepository implements RoomRepository {
     if (userId == null) {
       return const Failed(AuthFailure('Sign in to join a room.'));
     }
+    final normalized = RoomCode.extract(code);
+    if (!RoomCode.isComplete(normalized)) {
+      return const Failed(NotFoundFailure('Invalid room code.'));
+    }
     try {
-          final row = await _client
-              .rpc('get_room_by_code', params: {'p_code': code.trim()})
-              .maybeSingle();
+      final row = await _client
+          .rpc('get_room_by_code', params: {'p_code': normalized})
+          .maybeSingle();
       if (row == null) {
         return const Failed(NotFoundFailure('Invalid room code.'));
       }
@@ -359,8 +367,11 @@ class RoomSupabaseRepository implements RoomRepository {
   }
 
   String _generateCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    return List.generate(6, (_) => chars[_rand.nextInt(chars.length)]).join();
+    const chars = RoomCode.alphabet;
+    return List.generate(
+      RoomCode.length,
+      (_) => chars[_rand.nextInt(chars.length)],
+    ).join();
   }
 
   String _funRoomName() {

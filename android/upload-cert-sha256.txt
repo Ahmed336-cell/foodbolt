@@ -1,0 +1,5 @@
+# Upload-key SHA-256 (local android/upload-keystore.jks).
+# Play App Signing uses a different cert — copy that SHA from Play Console
+# (Release > Setup > App integrity) into docs/.well-known/assetlinks.json
+# before hosting on https://foodrush.app/.well-known/assetlinks.json
+SHA256: 03:54:00:54:17:76:39:61:38:60:67:6C:BD:01:D9:00:0C:8F:F3:9C:5D:F0:51:B8:0C:DF:6C:92:D0:E7:0F:BD

@@ -44,9 +44,23 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+assets/env/.env
 .env
+/.env
+
+# Android signing (never commit)
+android/key.properties
+android/*.jks
+android/*.keystore
+android/app/*.jks
+android/app/*.keystore
+android/play-store.json
 
 # Fastlane screenshot outputs (regenerate with `fastlane screenshots`)
 /android/fastlane/screenshots/
-/android/fastlane/metadata/android/**/images/
+/android/fastlane/metadata/android/**/images/phoneScreenshots/
+/android/fastlane/metadata/android/**/images/sevenInchScreenshots/
+/android/fastlane/metadata/android/**/images/tenInchScreenshots/
+/android/fastlane/metadata/android/**/images/tvScreenshots/
+/android/fastlane/metadata/android/**/images/wearScreenshots/
 /build/screenshots_raw/

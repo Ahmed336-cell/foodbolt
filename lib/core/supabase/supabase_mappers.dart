@@ -134,7 +134,7 @@ class SupabaseMappers {
       final code = error.code;
       final message = error.message;
       if (code == 'PGRST116') {
-        return const NotFoundFailure();
+        return NotFoundFailure(message.isEmpty ? 'Not found.' : message);
       }
       if (code == '42501' || message.toLowerCase().contains('permission')) {
         return PermissionFailure(message);
@@ -142,8 +142,13 @@ class SupabaseMappers {
       if (code == '23514' || code == '23502' || code == '22P02') {
         return ValidationFailure(message);
       }
+      // Prefer real DB message (FK / raise exception) over generic "Not found."
       if (code == '23503') {
-        return const NotFoundFailure();
+        return ServerFailure(message);
+      }
+      if (message.toLowerCase().contains('not authenticated') ||
+          message.toLowerCase().contains('could not be deleted')) {
+        return AuthFailure(message);
       }
       return ServerFailure(message);
     }

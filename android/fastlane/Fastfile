@@ -16,6 +16,34 @@ platform :android do
     File.expand_path("../..", __dir__)
   end
 
+  def release_apk_path
+    File.join(project_root, "build/app/outputs/flutter-apk/app-release.apk")
+  end
+
+  def release_aab_path
+    File.join(project_root, "build/app/outputs/bundle/release/app-release.aab")
+  end
+
+  def key_properties_path
+    File.join(project_root, "android/key.properties")
+  end
+
+  def play_json_key
+    ENV["PLAY_STORE_JSON_KEY"] || ENV["SUPPLY_JSON_KEY"] ||
+      File.join(project_root, "android/play-store.json")
+  end
+
+  def stage_store_graphics!
+    %w[en-US ar].each do |locale|
+      dest = File.join(__dir__, "metadata", "android", locale, "images")
+      FileUtils.mkdir_p(dest)
+      graphic = File.join(project_root, "store/play/feature-graphic.png")
+      icon = File.join(project_root, "store/play/icon-512.png")
+      FileUtils.cp(graphic, File.join(dest, "featureGraphic.png")) if File.exist?(graphic)
+      FileUtils.cp(icon, File.join(dest, "icon.png")) if File.exist?(icon)
+    end
+  end
+
   def ensure_android_device!
     devices = `adb devices`.lines
       .map(&:strip)
@@ -62,10 +90,27 @@ platform :android do
       sh("flutter", "build", "apk", "--release")
     end
 
-    apk = File.join(project_root, "build/app/outputs/flutter-apk/app-release.apk")
+    apk = release_apk_path
     UI.user_error!("APK not found at #{apk}") unless File.exist?(apk)
     UI.success("APK ready: #{apk}")
     apk
+  end
+
+  desc "Build signed Play Store AAB"
+  lane :build_aab do
+    UI.user_error!(
+      "Missing android/key.properties. Copy android/key.properties.example and add the upload keystore."
+    ) unless File.exist?(key_properties_path)
+
+    Dir.chdir(project_root) do
+      sh("flutter", "pub", "get")
+      sh("flutter", "build", "appbundle", "--release")
+    end
+
+    aab = release_aab_path
+    UI.user_error!("AAB not found at #{aab}") unless File.exist?(aab)
+    UI.success("AAB ready: #{aab}")
+    aab
   end
 
   desc "Capture store screenshots via Flutter integration_test + device"
@@ -92,7 +137,32 @@ platform :android do
     collect_screenshots!(device_id)
   end
 
-  desc "Build APK and publish it to a GitHub Release"
+  desc "Upload signed AAB to Play internal testing"
+  lane :play_internal do |options|
+    json_key = File.expand_path(options[:json_key] || play_json_key)
+    UI.user_error!(
+      "Missing Play service-account JSON. Set PLAY_STORE_JSON_KEY or place android/play-store.json"
+    ) unless File.exist?(json_key)
+
+    aab = options[:aab] || build_aab
+    stage_store_graphics!
+
+    upload_to_play_store(
+      json_key: json_key,
+      aab: aab,
+      package_name: "com.elm.foodbolt",
+      track: options[:track] || ENV["PLAY_TRACK"] || "internal",
+      skip_upload_metadata: false,
+      skip_upload_changelogs: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: !Dir.exist?(
+        File.join(__dir__, "metadata/android/en-US/images/phoneScreenshots")
+      ),
+      release_status: options[:release_status] || ENV["PLAY_RELEASE_STATUS"] || "draft"
+    )
+  end
+
+  desc "Build APK (and AAB if signed) and publish to a GitHub Release"
   lane :github_release do |options|
     tag = options[:tag] || ENV["RELEASE_TAG"] || ENV["GITHUB_REF_NAME"]
     UI.user_error!("Missing release tag (pass tag: or set RELEASE_TAG / GITHUB_REF_NAME)") if tag.to_s.empty?
@@ -106,12 +176,22 @@ platform :android do
     version_name = tag.sub(/\Av/, "")
     apk_path = build_apk
 
-    # Rename for clearer download asset
+    assets = []
     release_apk = File.join(File.dirname(apk_path), "FoodRush-#{version_name}.apk")
     FileUtils.cp(apk_path, release_apk)
+    assets << release_apk
+
+    if File.exist?(key_properties_path)
+      aab_path = build_aab
+      release_aab = File.join(File.dirname(aab_path), "FoodRush-#{version_name}.aab")
+      FileUtils.cp(aab_path, release_aab)
+      assets << release_aab
+    else
+      UI.important("No android/key.properties — skipping AAB (debug-signed APK only)")
+    end
 
     changelog = options[:changelog] || ENV["RELEASE_NOTES"] ||
-                "FoodRush #{version_name}\n\nAndroid release APK."
+                "FoodRush #{version_name}\n\nAndroid release."
 
     set_github_release(
       repository_name: repo,
@@ -121,10 +201,10 @@ platform :android do
       tag_name: tag,
       description: changelog,
       commitish: ENV["GITHUB_SHA"] || "main",
-      upload_assets: [release_apk],
+      upload_assets: assets,
       is_generate_release_notes: ENV["GENERATE_RELEASE_NOTES"] != "false"
     )
 
-    UI.success("GitHub Release #{tag} published with #{File.basename(release_apk)}")
+    UI.success("GitHub Release #{tag} published with #{assets.map { |p| File.basename(p) }.join(', ')}")
   end
 end

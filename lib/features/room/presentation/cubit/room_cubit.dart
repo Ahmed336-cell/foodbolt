@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/phase/room_phase.dart';
+import '../../../../core/room/room_code.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/repositories/room_repository.dart';
 import '../../domain/usecases/room_usecases.dart';
@@ -57,6 +58,7 @@ class RoomCubit extends Cubit<RoomState> {
     required SetRoomPhase setRoomPhase,
     required SetRoomSelectionMode setRoomSelectionMode,
     required GetInviteLink getInviteLink,
+    required LeaveRoom leaveRoom,
   })  : _roomRepository = roomRepository,
         _createRoom = createRoom,
         _joinRoom = joinRoom,
@@ -64,6 +66,7 @@ class RoomCubit extends Cubit<RoomState> {
         _setRoomPhase = setRoomPhase,
         _setRoomSelectionMode = setRoomSelectionMode,
         _getInviteLink = getInviteLink,
+        _leaveRoom = leaveRoom,
         super(const RoomState());
 
   final RoomRepository _roomRepository;
@@ -73,6 +76,7 @@ class RoomCubit extends Cubit<RoomState> {
   final SetRoomPhase _setRoomPhase;
   final SetRoomSelectionMode _setRoomSelectionMode;
   final GetInviteLink _getInviteLink;
+  final LeaveRoom _leaveRoom;
 
   StreamSubscription<Room>? _roomSub;
   StreamSubscription<List<RoomMember>>? _membersSub;
@@ -102,7 +106,8 @@ class RoomCubit extends Cubit<RoomState> {
 
   Future<Room?> joinWithCode(String code) async {
     emit(state.copyWith(loading: true, clearError: true));
-    final result = await _joinRoom(code);
+    final normalized = RoomCode.extract(code);
+    final result = await _joinRoom(normalized);
     return result.fold(
       (f) {
         emit(state.copyWith(loading: false, error: f.message));
@@ -198,6 +203,39 @@ class RoomCubit extends Cubit<RoomState> {
     if (room == null) return null;
     final result = await _getInviteLink(room.id);
     return result.dataOrNull;
+  }
+
+  /// Host cancels lobby room (marks completed); anyone can leave.
+  Future<bool> leave({required bool isHost}) async {
+    final room = state.room;
+    if (room == null) return false;
+    emit(state.copyWith(loading: true, clearError: true));
+
+    if (isHost && room.phase == RoomPhase.lobby) {
+      final cancel = await _setRoomPhase(
+        SetPhaseParams(roomId: room.id, phase: RoomPhase.completed),
+      );
+      final cancelOk = cancel.fold(
+        (f) {
+          emit(state.copyWith(loading: false, error: f.message));
+          return false;
+        },
+        (_) => true,
+      );
+      if (!cancelOk) return false;
+    }
+
+    final result = await _leaveRoom(room.id);
+    return result.fold(
+      (f) {
+        emit(state.copyWith(loading: false, error: f.message));
+        return false;
+      },
+      (_) {
+        emit(const RoomState());
+        return true;
+      },
+    );
   }
 
   void clearToast() => emit(state.copyWith(clearToast: true));

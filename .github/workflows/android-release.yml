@@ -1,11 +1,15 @@
-# Build release APK with Flutter + Fastlane, then attach to a GitHub Release.
+# Build signed Android artifacts with Flutter + Fastlane.
 #
 # Trigger:
 #   git tag v1.0.0 && git push origin v1.0.0
 #   or Actions → Android Release → Run workflow
 #
-# Optional repo secrets (baked into .env for the APK):
-#   SUPABASE_URL, SUPABASE_ANON_KEY, INVITE_BASE_URL, USE_MOCKS, BRANCH_KEY
+# Repo secrets:
+#   SUPABASE_URL, SUPABASE_ANON_KEY, INVITE_BASE_URL, BRANCH_KEY
+#   USE_MOCKS (optional; defaults to false when SUPABASE_* are set)
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_PASSWORD
+#   ANDROID_KEY_ALIAS (optional, default: upload)
+#   PLAY_STORE_JSON (service-account JSON, optional; enables Play internal upload)
 #
 # GITHUB_TOKEN is provided by Actions (contents: write).
 
@@ -21,6 +25,11 @@ on:
         description: "Release tag (e.g. v1.0.1). Leave empty to use run id tag."
         required: false
         type: string
+      play_internal:
+        description: "Also upload AAB to Play internal testing"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -31,7 +40,7 @@ concurrency:
 
 jobs:
   release:
-    name: Build APK & GitHub Release
+    name: Build & GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -75,7 +84,7 @@ jobs:
         working-directory: .
         run: flutter doctor -v
 
-      - name: Write .env for release build
+      - name: Write release env
         working-directory: .
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -84,14 +93,40 @@ jobs:
           INVITE_BASE_URL: ${{ secrets.INVITE_BASE_URL }}
           USE_MOCKS: ${{ secrets.USE_MOCKS }}
         run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
+            MOCKS="${USE_MOCKS:-false}"
+          else
+            echo "::error::SUPABASE_URL / SUPABASE_ANON_KEY secrets missing — refusing mock Play build"
+            exit 1
+          fi
           {
-            echo "SUPABASE_URL=${SUPABASE_URL:-}"
-            echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}"
+            echo "SUPABASE_URL=${SUPABASE_URL}"
+            echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}"
             echo "BRANCH_KEY=${BRANCH_KEY:-}"
-            echo "INVITE_BASE_URL=${INVITE_BASE_URL:-foodrush://join}"
-            echo "USE_MOCKS=${USE_MOCKS:-true}"
-          } > .env
-          test -f .env
+            echo "INVITE_BASE_URL=${INVITE_BASE_URL:-https://foodrush.app/join}"
+            echo "USE_MOCKS=${MOCKS}"
+          } > assets/env/.env
+          test -f assets/env/.env
+
+      - name: Restore upload keystore
+        working-directory: .
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::error::Missing ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_PASSWORD"
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          {
+            echo "storePassword=${ANDROID_KEYSTORE_PASSWORD}"
+            echo "keyPassword=${ANDROID_KEY_PASSWORD}"
+            echo "keyAlias=${ANDROID_KEY_ALIAS:-upload}"
+            echo "storeFile=../upload-keystore.jks"
+          } > android/key.properties
 
       - name: Drop legacy Bundler lock (forces Bundler 2.5)
         working-directory: android
@@ -108,7 +143,7 @@ jobs:
           bundler-cache: true
           working-directory: android
 
-      - name: Build APK and publish GitHub Release (Fastlane)
+      - name: Build and publish GitHub Release (Fastlane)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -117,10 +152,25 @@ jobs:
           GENERATE_RELEASE_NOTES: "true"
         run: bundle exec fastlane android github_release tag:"${RELEASE_TAG}"
 
-      - name: Upload APK artifact
+      - name: Upload Play internal (optional)
+        continue-on-error: true
+        if: ${{ github.event.inputs.play_internal == 'true' || startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          PLAY_STORE_JSON: ${{ secrets.PLAY_STORE_JSON }}
+        run: |
+          if [ -z "$PLAY_STORE_JSON" ]; then
+            echo "PLAY_STORE_JSON not set — skip Play upload"
+            exit 0
+          fi
+          printf '%s' "$PLAY_STORE_JSON" > play-store.json
+          bundle exec fastlane android play_internal json_key:"$PWD/play-store.json"
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: FoodRush-${{ steps.meta.outputs.tag }}
-          path: build/app/outputs/flutter-apk/*.apk
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/release/*.aab
           if-no-files-found: error
           retention-days: 30

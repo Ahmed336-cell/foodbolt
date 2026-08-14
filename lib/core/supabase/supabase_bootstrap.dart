@@ -16,16 +16,23 @@ class SupabaseBootstrap {
     }
     if (initialized) return true;
 
-    await Supabase.initialize(
-      url: AppEnv.supabaseUrl,
-      anonKey: AppEnv.supabaseAnonKey,
-      authOptions: const FlutterAuthClientOptions(
-        authFlowType: AuthFlowType.pkce,
-      ),
-    );
-    initialized = true;
-    debugPrint('Supabase: initialized');
-    return true;
+    try {
+      await Supabase.initialize(
+        url: AppEnv.supabaseUrl,
+        anonKey: AppEnv.supabaseAnonKey,
+        authOptions: const FlutterAuthClientOptions(
+          authFlowType: AuthFlowType.pkce,
+        ),
+      );
+      initialized = true;
+      debugPrint(
+        'Supabase: initialized (${AppEnv.supabaseUrl})',
+      );
+      return true;
+    } catch (e, st) {
+      debugPrint('Supabase: initialize failed: $e\n$st');
+      return false;
+    }
   }
 
   static SupabaseClient get client {

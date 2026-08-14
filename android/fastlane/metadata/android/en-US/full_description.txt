@@ -1,0 +1,14 @@
+FoodRush is group food ordering made simple.
+
+Create a room, share one invite link, and let friends join in seconds — even as guests, no account required.
+
+Decide what to eat:
+• Suggest restaurants
+• Vote as a group
+• Tied vote? The restaurants race it out
+
+Then order together, upload the receipt, and split the bill so everyone sees exactly what they owe.
+
+Built for hangouts, office lunches, and last-minute “where are we eating?” chaos.
+
+Privacy: we collect account email (if you sign up), display name, room/order data, and receipt photos you upload. We do not sell your data. Delete your account anytime from Profile.

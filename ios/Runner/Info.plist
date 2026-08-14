@@ -37,6 +37,12 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>FoodRush uses the camera so you can photograph a receipt to split the bill.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>FoodRush needs photo access so you can attach a receipt image.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>FoodRush does not save photos to your library.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

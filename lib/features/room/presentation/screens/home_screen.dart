@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/config/env.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/responsive/breakpoints.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -101,6 +102,29 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ],
                 ),
+                if (AppEnv.usingMocks) ...[
+                  const SizedBox(height: 8),
+                  Material(
+                    color: const Color(0xFFFFE0A3),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      child: Text(
+                        AppEnv.liveBackendRequestedButUnavailable
+                            ? 'Offline mock mode — rooms are NOT saved to Supabase. Fix `.env` SUPABASE_* and full restart.'
+                            : 'Mock mode — rooms stay on this device only. Set USE_MOCKS=false + SUPABASE_* in `.env` for multi-phone join.',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF5C3B00),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 Expanded(
                   child: FadeTransition(
                     opacity: _fade,

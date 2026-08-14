@@ -216,7 +216,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterRoomCode => 'Enter the room code';
 
   @override
-  String get roomCodeHint => 'ABC123';
+  String get roomCodeHint => '6 characters · CAPITAL letters & numbers';
+
+  @override
+  String get roomCodeLabel => 'Room code';
+
+  @override
+  String get tapCodeToCopy => 'Tap code to copy';
 
   @override
   String get codeCopied => 'Code copied';
@@ -228,6 +234,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inviteFriends => 'Invite Friends';
+
+  @override
+  String get leaveRoom => 'Leave room';
+
+  @override
+  String get leaveRoomTitle => 'Leave room?';
+
+  @override
+  String get leaveRoomBody =>
+      'You will leave this room. You can join again with the code if it is still open.';
+
+  @override
+  String get cancelRoom => 'Cancel room';
+
+  @override
+  String get cancelRoomTitle => 'Cancel room?';
+
+  @override
+  String get cancelRoomBody =>
+      'This ends the room for everyone. Friends will no longer be able to join.';
 
   @override
   String playersReady(int count) {
@@ -582,13 +608,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lockOrdersBody =>
-      'After locking, participants cannot edit their orders.';
+      'After locking, participants cannot edit. You will see the combined order to send to the restaurant.';
 
   @override
   String get submitted => 'Submitted';
 
   @override
   String get notSubmitted => 'Not submitted';
+
+  @override
+  String get orderDetailsTitle => 'Order for restaurant';
+
+  @override
+  String get orderDetailsPrompt =>
+      'Send this order to the restaurant (WhatsApp, call, or delivery app).';
+
+  @override
+  String get combinedOrder => 'Combined order';
+
+  @override
+  String get combinedOrderHint =>
+      'Same items from different people are merged into one line.';
+
+  @override
+  String sharedBy(String people) {
+    return 'Shared by $people';
+  }
+
+  @override
+  String orderedBy(String people) {
+    return 'Ordered by $people';
+  }
+
+  @override
+  String get perPersonOrders => 'Per person';
+
+  @override
+  String get shareWithRestaurant => 'Share';
+
+  @override
+  String get orderDetailsCopied => 'Order copied — paste to the restaurant.';
+
+  @override
+  String get continueToReceipt => 'Continue to receipt';
+
+  @override
+  String get waitingHostReceipt => 'Waiting for host to continue…';
 
   @override
   String get uploadReceiptTitle => 'Upload receipt';

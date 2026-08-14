@@ -75,10 +75,9 @@ class OrderMockRepository implements OrderRepository {
     if (hostResult case Failed(:final failure)) return Failed(failure);
     final roomResult = _store.requireRoom(roomId);
     if (roomResult case Failed(:final failure)) return Failed(failure);
-    _store.emitRoom(roomResult.dataOrNull!.copyWith(phase: RoomPhase.ordersLocked));
-    // Move to receipt phase after lock so host can upload.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    _store.emitRoom(roomResult.dataOrNull!.copyWith(phase: RoomPhase.receipt));
+    _store.emitRoom(
+      roomResult.dataOrNull!.copyWith(phase: RoomPhase.ordersLocked),
+    );
     return const Success(null);
   }
 

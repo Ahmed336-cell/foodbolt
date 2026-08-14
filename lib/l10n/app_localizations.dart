@@ -497,8 +497,20 @@ abstract class AppLocalizations {
   /// No description provided for @roomCodeHint.
   ///
   /// In en, this message translates to:
-  /// **'ABC123'**
+  /// **'6 characters · CAPITAL letters & numbers'**
   String get roomCodeHint;
+
+  /// No description provided for @roomCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room code'**
+  String get roomCodeLabel;
+
+  /// No description provided for @tapCodeToCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap code to copy'**
+  String get tapCodeToCopy;
 
   /// No description provided for @codeCopied.
   ///
@@ -517,6 +529,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invite Friends'**
   String get inviteFriends;
+
+  /// No description provided for @leaveRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave room'**
+  String get leaveRoom;
+
+  /// No description provided for @leaveRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave room?'**
+  String get leaveRoomTitle;
+
+  /// No description provided for @leaveRoomBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You will leave this room. You can join again with the code if it is still open.'**
+  String get leaveRoomBody;
+
+  /// No description provided for @cancelRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel room'**
+  String get cancelRoom;
+
+  /// No description provided for @cancelRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel room?'**
+  String get cancelRoomTitle;
+
+  /// No description provided for @cancelRoomBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This ends the room for everyone. Friends will no longer be able to join.'**
+  String get cancelRoomBody;
 
   /// No description provided for @playersReady.
   ///
@@ -1175,7 +1223,7 @@ abstract class AppLocalizations {
   /// No description provided for @lockOrdersBody.
   ///
   /// In en, this message translates to:
-  /// **'After locking, participants cannot edit their orders.'**
+  /// **'After locking, participants cannot edit. You will see the combined order to send to the restaurant.'**
   String get lockOrdersBody;
 
   /// No description provided for @submitted.
@@ -1189,6 +1237,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not submitted'**
   String get notSubmitted;
+
+  /// No description provided for @orderDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order for restaurant'**
+  String get orderDetailsTitle;
+
+  /// No description provided for @orderDetailsPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send this order to the restaurant (WhatsApp, call, or delivery app).'**
+  String get orderDetailsPrompt;
+
+  /// No description provided for @combinedOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Combined order'**
+  String get combinedOrder;
+
+  /// No description provided for @combinedOrderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Same items from different people are merged into one line.'**
+  String get combinedOrderHint;
+
+  /// No description provided for @sharedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared by {people}'**
+  String sharedBy(String people);
+
+  /// No description provided for @orderedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordered by {people}'**
+  String orderedBy(String people);
+
+  /// No description provided for @perPersonOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Per person'**
+  String get perPersonOrders;
+
+  /// No description provided for @shareWithRestaurant.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareWithRestaurant;
+
+  /// No description provided for @orderDetailsCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Order copied — paste to the restaurant.'**
+  String get orderDetailsCopied;
+
+  /// No description provided for @continueToReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to receipt'**
+  String get continueToReceipt;
+
+  /// No description provided for @waitingHostReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for host to continue…'**
+  String get waitingHostReceipt;
 
   /// No description provided for @uploadReceiptTitle.
   ///
