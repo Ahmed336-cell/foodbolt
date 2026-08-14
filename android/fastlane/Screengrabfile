@@ -1,0 +1,11 @@
+# Fastlane Screengrab / Flutter screenshot output layout.
+# Primary capture uses Flutter integration_test (see Fastfile :screenshots).
+
+app_package_name('com.elm.foodbolt')
+
+locales(['en-US', 'ar'])
+
+clear_previous_screenshots(true)
+
+# Where Fastlane stores final shots for Play Console / framing.
+output_directory('fastlane/metadata/android')

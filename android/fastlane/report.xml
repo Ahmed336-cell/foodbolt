@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="0: opt_out_usage" time="0.000304">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: default_platform" time="0.000133">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: flutter pub get" time="1.633667">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: flutter drive --driver\=test_driver/integration_test.dart --target\=integration_test/screenshots_test.dart -d emulator-5554 --dart-define\=SCREENSHOTS\=true" time="130.690989">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>
