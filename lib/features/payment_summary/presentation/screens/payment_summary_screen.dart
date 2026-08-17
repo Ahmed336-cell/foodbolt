@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../cost_sharing/presentation/cubit/cost_sharing_cubit.dart';
 import '../../../receipt/presentation/cubit/receipt_cubit.dart';
+import '../../../receipt/presentation/widgets/receipt_photo.dart';
 import '../../../room/presentation/cubit/room_cubit.dart';
 import '../../../suggestions/presentation/cubit/suggestion_cubit.dart';
 import '../../domain/entities/payment_record.dart';
@@ -48,6 +49,21 @@ class PaymentSummaryScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+              Builder(
+                builder: (context) {
+                  final receipt = context.watch<ReceiptCubit>().state;
+                  final photo = ReceiptPhoto(
+                    localPath: receipt.localPath,
+                    imageUrl: receipt.receipt?.imageUrl,
+                    height: 180,
+                  );
+                  if (!photo.hasImage) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: photo,
+                  );
+                },
+              ),
               if (skipped) ...[
                 Container(
                   width: double.infinity,
@@ -221,6 +237,21 @@ class RoomSummaryScreen extends StatelessWidget {
             ),
             Text(l10n.participantsCount(members.length)),
             const SizedBox(height: 12),
+            Builder(
+              builder: (context) {
+                final receipt = context.watch<ReceiptCubit>().state;
+                final photo = ReceiptPhoto(
+                  localPath: receipt.localPath,
+                  imageUrl: receipt.receipt?.imageUrl,
+                  height: 180,
+                );
+                if (!photo.hasImage) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: photo,
+                );
+              },
+            ),
             MoneyText(
               total,
               style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900),

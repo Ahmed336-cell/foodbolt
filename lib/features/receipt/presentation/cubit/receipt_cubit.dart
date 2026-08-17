@@ -71,7 +71,13 @@ class ReceiptCubit extends Cubit<ReceiptState> {
     _roomId = roomId;
     _sub?.cancel();
     _sub = _repository.watchReceipt(roomId).listen((receipt) {
-      emit(state.copyWith(receipt: receipt));
+      emit(
+        state.copyWith(
+          receipt: receipt,
+          success: receipt.status == ReceiptStatus.uploaded ||
+              receipt.status == ReceiptStatus.skipped,
+        ),
+      );
     });
   }
 

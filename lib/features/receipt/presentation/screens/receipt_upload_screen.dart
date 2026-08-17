@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
 import '../../../../core/widgets/numeric_input.dart';
 import '../cubit/receipt_cubit.dart';
+import '../widgets/receipt_photo.dart';
 
 class ReceiptUploadScreen extends StatelessWidget {
   const ReceiptUploadScreen({super.key});
@@ -42,29 +43,23 @@ class ReceiptUploadScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.black12, width: 2),
                     ),
-                    child: state.localPath == null
-                        ? Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text('🧾', style: TextStyle(fontSize: 44)),
-                                const SizedBox(height: 8),
-                                Text(
-                                  l10n.receiptFrameHint,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                    child: ReceiptPhoto(
+                      localPath: state.localPath,
+                      imageUrl: state.receipt?.imageUrl,
+                      empty: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('🧾', style: TextStyle(fontSize: 44)),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.receiptFrameHint,
+                              textAlign: TextAlign.center,
                             ),
-                          )
-                        : Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text(
-                                state.localPath!,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/error/failures.dart';
@@ -11,6 +13,7 @@ class SuggestionSupabaseRepository implements SuggestionRepository {
       : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
+  final _channels = <String, RealtimeChannel>{};
 
   @override
   Future<Result<RestaurantSuggestion>> addSuggestion({
@@ -78,19 +81,18 @@ class SuggestionSupabaseRepository implements SuggestionRepository {
           .select()
           .single();
 
-      return Success(
-        RestaurantSuggestion(
-          id: row['id'] as String,
-          roomId: roomId,
-          name: row['name'] as String,
-          category: row['category'] as String?,
-          note: row['note'] as String?,
-          imageUrl: row['image_url'] as String?,
-          suggestedBy: userId,
-          suggestedByName:
-              profile?['display_name'] as String? ?? 'User',
-        ),
+      final created = RestaurantSuggestion(
+        id: row['id'] as String,
+        roomId: roomId,
+        name: row['name'] as String,
+        category: row['category'] as String?,
+        note: row['note'] as String?,
+        imageUrl: row['image_url'] as String?,
+        suggestedBy: userId,
+        suggestedByName: profile?['display_name'] as String? ?? 'User',
       );
+      await _broadcastChange(roomId);
+      return Success(created);
     } catch (e, st) {
       return Failed(SupabaseMappers.mapError(e, st));
     }
@@ -102,32 +104,102 @@ class SuggestionSupabaseRepository implements SuggestionRepository {
     required String suggestionId,
   }) async {
     final userId = SupabaseMappers.requireUserId(_client);
-    if (userId == null) return const Failed(AuthFailure());
+    if (userId == null) return const Failed(AuthFailure('Not signed in.'));
+    final id = suggestionId.trim();
+    if (id.isEmpty) {
+      return const Failed(NotFoundFailure('Restaurant not found.'));
+    }
 
     try {
-      final item = await _client
+      await _client.rpc('delete_suggestion', params: {'p_id': id});
+      await _broadcastChange(roomId);
+      return const Success(null);
+    } catch (e, st) {
+      if (_isMissingDeleteRpc(e)) {
+        return _removeViaRest(
+          roomId: roomId,
+          suggestionId: id,
+          userId: userId,
+        );
+      }
+      final failure = SupabaseMappers.mapError(e, st);
+      if (failure is NotFoundFailure) {
+        await _broadcastChange(roomId);
+        return const Failed(NotFoundFailure('Restaurant not found.'));
+      }
+      return Failed(failure);
+    }
+  }
+
+  Future<Result<void>> _removeViaRest({
+    required String roomId,
+    required String suggestionId,
+    required String userId,
+  }) async {
+    try {
+      final rows = await _client
           .from('suggestions')
-          .select('suggested_by')
+          .select('id, suggested_by, room_id')
           .eq('id', suggestionId)
-          .eq('room_id', roomId)
-          .maybeSingle();
-      if (item == null) return const Failed(NotFoundFailure());
+          .limit(1);
+      if (rows is! List || rows.isEmpty) {
+        await _broadcastChange(roomId);
+        return const Failed(NotFoundFailure('Restaurant not found.'));
+      }
+      final item = Map<String, dynamic>.from(rows.first as Map);
+      final itemRoomId = item['room_id']?.toString();
+      if (itemRoomId != null &&
+          itemRoomId.isNotEmpty &&
+          roomId.isNotEmpty &&
+          itemRoomId != roomId) {
+        return const Failed(NotFoundFailure('Restaurant not found.'));
+      }
 
       final room = await _client
           .from('rooms')
           .select('host_id')
-          .eq('id', roomId)
-          .maybeSingle();
-      final isHost = room?['host_id'] == userId;
-      if (item['suggested_by'] != userId && !isHost) {
+          .eq('id', itemRoomId ?? roomId)
+          .limit(1);
+      final hostId = room is List && room.isNotEmpty
+          ? (room.first as Map)['host_id']?.toString()
+          : null;
+      final isHost = hostId == userId;
+      if (item['suggested_by']?.toString() != userId && !isHost) {
         return const Failed(PermissionFailure());
       }
 
+      try {
+        await _client
+            .from('rooms')
+            .update({'winner_suggestion_id': null})
+            .eq('winner_suggestion_id', suggestionId);
+      } catch (_) {}
+      try {
+        await _client
+            .from('races')
+            .update({'winner_id': null})
+            .eq('winner_id', suggestionId);
+      } catch (_) {}
+
       await _client.from('suggestions').delete().eq('id', suggestionId);
+      await _broadcastChange(roomId);
       return const Success(null);
     } catch (e, st) {
-      return Failed(SupabaseMappers.mapError(e, st));
+      final failure = SupabaseMappers.mapError(e, st);
+      if (failure is NotFoundFailure) {
+        return const Failed(NotFoundFailure('Restaurant not found.'));
+      }
+      return Failed(failure);
     }
+  }
+
+  bool _isMissingDeleteRpc(Object error) {
+    final text = error.toString().toLowerCase();
+    return text.contains('delete_suggestion') &&
+        (text.contains('does not exist') ||
+            text.contains('42883') ||
+            text.contains('pgrst202') ||
+            text.contains('could not find the function'));
   }
 
   @override
@@ -144,11 +216,55 @@ class SuggestionSupabaseRepository implements SuggestionRepository {
 
   @override
   Stream<List<RestaurantSuggestion>> watchSuggestions(String roomId) {
-    return _client
-        .from('suggestions')
-        .stream(primaryKey: ['id'])
-        .eq('room_id', roomId)
-        .asyncMap((_) => _loadSuggestions(roomId));
+    late final StreamController<List<RestaurantSuggestion>> controller;
+    StreamSubscription? pgSub;
+    RealtimeChannel? channel;
+
+    Future<void> push() async {
+      if (controller.isClosed) return;
+      try {
+        controller.add(await _loadSuggestions(roomId));
+      } catch (e, st) {
+        if (!controller.isClosed) controller.addError(e, st);
+      }
+    }
+
+    controller = StreamController<List<RestaurantSuggestion>>(
+      onListen: () {
+        unawaited(push());
+        pgSub = _client
+            .from('suggestions')
+            .stream(primaryKey: ['id'])
+            .eq('room_id', roomId)
+            .listen((_) => unawaited(push()), onError: (_) => unawaited(push()));
+
+        channel = _client.channel('room-suggestions-$roomId');
+        channel!
+            .onBroadcast(
+              event: 'suggestions',
+              callback: (_) => unawaited(push()),
+            )
+            .subscribe();
+        _channels[roomId] = channel!;
+      },
+      onCancel: () async {
+        await pgSub?.cancel();
+        await channel?.unsubscribe();
+        _channels.remove(roomId);
+      },
+    );
+    return controller.stream;
+  }
+
+  Future<void> _broadcastChange(String roomId) async {
+    try {
+      final channel =
+          _channels[roomId] ?? _client.channel('room-suggestions-$roomId');
+      await channel.sendBroadcastMessage(
+        event: 'suggestions',
+        payload: {'at': DateTime.now().millisecondsSinceEpoch},
+      );
+    } catch (_) {}
   }
 
   Future<List<RestaurantSuggestion>> _loadSuggestions(String roomId) async {
@@ -174,8 +290,8 @@ class SuggestionSupabaseRepository implements SuggestionRepository {
     final names = await _profileNames(userIds);
 
     final list = (rows as List).map((r) {
-      final id = r['id'] as String;
-      final by = r['suggested_by'] as String;
+      final id = r['id'].toString();
+      final by = r['suggested_by'].toString();
       return RestaurantSuggestion(
         id: id,
         roomId: roomId,

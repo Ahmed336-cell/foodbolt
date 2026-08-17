@@ -58,7 +58,9 @@ class SuggestionMockRepository implements SuggestionRepository {
     if (userResult case Failed(:final failure)) return Failed(failure);
     final list = _store.suggestions[roomId] ?? [];
     final item = list.where((s) => s.id == suggestionId).firstOrNull;
-    if (item == null) return const Failed(NotFoundFailure());
+    if (item == null) {
+      return const Failed(NotFoundFailure('Restaurant not found.'));
+    }
     if (item.suggestedBy != userResult.dataOrNull!.id &&
         _store.rooms[roomId]?.hostId != userResult.dataOrNull!.id) {
       return const Failed(PermissionFailure());

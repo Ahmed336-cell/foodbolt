@@ -30,6 +30,7 @@ class ReceiptMockRepository implements ReceiptRepository {
       roomId: roomId,
       status: ReceiptStatus.uploaded,
       localPath: localPath,
+      imageUrl: localPath,
       totalAmount: totalAmount,
       uploadedBy: userResult.dataOrNull!.id,
     );
@@ -114,4 +115,12 @@ class ReceiptMockRepository implements ReceiptRepository {
 
   @override
   Stream<Receipt> watchReceipt(String roomId) => _store.watchReceipt(roomId);
+
+  @override
+  Future<Result<Receipt>> getReceipt(String roomId) async {
+    return Success(
+      _store.receipts[roomId] ??
+          Receipt(roomId: roomId, status: ReceiptStatus.none),
+    );
+  }
 }

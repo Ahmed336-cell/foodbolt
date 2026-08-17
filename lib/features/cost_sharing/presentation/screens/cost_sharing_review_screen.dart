@@ -6,6 +6,8 @@ import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
 import '../../../../core/widgets/numeric_input.dart';
+import '../../../receipt/presentation/cubit/receipt_cubit.dart';
+import '../../../receipt/presentation/widgets/receipt_photo.dart';
 import '../cubit/cost_sharing_cubit.dart';
 
 class CostSharingReviewScreen extends StatelessWidget {
@@ -29,6 +31,21 @@ class CostSharingReviewScreen extends StatelessWidget {
               const SizedBox(height: 8),
               SectionPrompt(text: l10n.reviewFinalBill),
               const SizedBox(height: 12),
+              Builder(
+                builder: (context) {
+                  final receipt = context.watch<ReceiptCubit>().state;
+                  final photo = ReceiptPhoto(
+                    localPath: receipt.localPath,
+                    imageUrl: receipt.receipt?.imageUrl,
+                    height: 200,
+                  );
+                  if (!photo.hasImage) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: photo,
+                  );
+                },
+              ),
               if (state.error != null) ErrorBanner(message: state.error!),
               if (draft != null) ...[
                 _row(l10n.expectedOrders, draft.expectedOrdersTotal),

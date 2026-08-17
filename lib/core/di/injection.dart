@@ -20,6 +20,7 @@ import '../../features/deep_link/data/repositories/deep_link_supabase_repository
 import '../../features/deep_link/domain/repositories/deep_link_repository.dart';
 import '../../features/deep_link/presentation/cubit/deep_link_cubit.dart';
 import '../../features/history/presentation/cubit/history_cubit.dart';
+import '../../features/history/presentation/cubit/history_detail_cubit.dart';
 import '../../features/orders/data/repositories/order_mock_repository.dart';
 import '../../features/orders/data/repositories/order_supabase_repository.dart';
 import '../../features/orders/data/repositories/saved_orders_prefs_repository.dart';
@@ -301,4 +302,13 @@ void _registerUseCasesAndCubits() {
     ),
   );
   sl.registerFactory(() => HistoryCubit(sl()));
+  sl.registerFactory(
+    () => HistoryDetailCubit(
+      getRoom: sl(),
+      orderRepository: sl(),
+      receiptRepository: sl(),
+      costSharingRepository: sl(),
+      suggestionRepository: sl(),
+    ),
+  );
 }

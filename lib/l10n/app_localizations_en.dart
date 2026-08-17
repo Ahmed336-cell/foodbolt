@@ -171,6 +171,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historySubtitle => 'Past rooms & bills';
 
   @override
+  String get historyDetailTitle => 'Past order';
+
+  @override
+  String get historyNoReceipt => 'No receipt photo';
+
+  @override
   String get nameYourHangout => 'Name your hangout';
 
   @override
@@ -551,6 +557,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitMyOrder => 'Submit My Order';
 
   @override
+  String get emptyOrderTitle => 'You didn\'t add an order';
+
+  @override
+  String get emptyOrderBody =>
+      'Your list is empty. Send an empty order anyway? The group will see that you\'re not ordering food.';
+
+  @override
+  String get sendEmptyOrder => 'Send empty order';
+
+  @override
   String get orderSubmitted => 'Your order has been submitted.';
 
   @override
@@ -863,6 +879,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errRoomNotFound => 'Room not found.';
 
   @override
+  String get errRestaurantNotFound => 'Restaurant not found.';
+
+  @override
+  String get errRemoveRestaurant => 'Couldn\'t remove this restaurant.';
+
+  @override
   String get errRoomEnded => 'This room has already ended.';
 
   @override
@@ -936,6 +958,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errSelectReceiptImage => 'Select a receipt image first.';
+
+  @override
+  String get errReceiptUploadFailed =>
+      'Couldn\'t upload the receipt. Try again.';
 
   @override
   String get errRoomNotReady => 'Room not ready.';

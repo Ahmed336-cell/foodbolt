@@ -78,6 +78,11 @@ class CostSharingMockRepository implements CostSharingRepository {
   }
 
   @override
+  Future<Result<CostShareDraft?>> getCostShare(String roomId) async {
+    return Success(_store.costShares[roomId]);
+  }
+
+  @override
   Stream<CostShareDraft> watchCostShare(String roomId) =>
       _store.watchCost(roomId);
 }

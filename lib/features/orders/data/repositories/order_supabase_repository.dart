@@ -178,6 +178,15 @@ class OrderSupabaseRepository implements OrderRepository {
   }
 
   @override
+  Future<Result<List<UserOrder>>> getOrders(String roomId) async {
+    try {
+      return Success(await _loadOrders(roomId));
+    } catch (e, st) {
+      return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
+  @override
   Stream<List<UserOrder>> watchOrders(String roomId) {
     return _client
         .from('orders')

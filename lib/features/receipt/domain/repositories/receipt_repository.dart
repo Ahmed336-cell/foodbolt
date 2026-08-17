@@ -12,4 +12,6 @@ abstract class ReceiptRepository {
   Future<Result<Receipt>> skipReceipt(String roomId);
 
   Stream<Receipt> watchReceipt(String roomId);
+
+  Future<Result<Receipt>> getReceipt(String roomId);
 }

@@ -410,6 +410,18 @@ abstract class AppLocalizations {
   /// **'Past rooms & bills'**
   String get historySubtitle;
 
+  /// No description provided for @historyDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Past order'**
+  String get historyDetailTitle;
+
+  /// No description provided for @historyNoReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'No receipt photo'**
+  String get historyNoReceipt;
+
   /// No description provided for @nameYourHangout.
   ///
   /// In en, this message translates to:
@@ -1112,6 +1124,24 @@ abstract class AppLocalizations {
   /// **'Submit My Order'**
   String get submitMyOrder;
 
+  /// No description provided for @emptyOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You didn\'t add an order'**
+  String get emptyOrderTitle;
+
+  /// No description provided for @emptyOrderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your list is empty. Send an empty order anyway? The group will see that you\'re not ordering food.'**
+  String get emptyOrderBody;
+
+  /// No description provided for @sendEmptyOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Send empty order'**
+  String get sendEmptyOrder;
+
   /// No description provided for @orderSubmitted.
   ///
   /// In en, this message translates to:
@@ -1694,6 +1724,18 @@ abstract class AppLocalizations {
   /// **'Room not found.'**
   String get errRoomNotFound;
 
+  /// No description provided for @errRestaurantNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant not found.'**
+  String get errRestaurantNotFound;
+
+  /// No description provided for @errRemoveRestaurant.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove this restaurant.'**
+  String get errRemoveRestaurant;
+
   /// No description provided for @errRoomEnded.
   ///
   /// In en, this message translates to:
@@ -1837,6 +1879,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select a receipt image first.'**
   String get errSelectReceiptImage;
+
+  /// No description provided for @errReceiptUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t upload the receipt. Try again.'**
+  String get errReceiptUploadFailed;
 
   /// No description provided for @errRoomNotReady.
   ///

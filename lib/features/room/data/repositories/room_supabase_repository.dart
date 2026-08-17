@@ -78,15 +78,26 @@ class RoomSupabaseRepository implements RoomRepository {
       return const Failed(NotFoundFailure('Invalid room code.'));
     }
     try {
-      final row = await _client
-          .rpc('get_room_by_code', params: {'p_code': normalized})
-          .maybeSingle();
+      final raw = await _client.rpc(
+        'get_room_by_code',
+        params: {'p_code': normalized},
+      );
+      Map<String, dynamic>? row;
+      if (raw is List && raw.isNotEmpty && raw.first is Map) {
+        row = Map<String, dynamic>.from(raw.first as Map);
+      } else if (raw is Map) {
+        row = Map<String, dynamic>.from(raw);
+      }
       if (row == null) {
         return const Failed(NotFoundFailure('Invalid room code.'));
       }
-      return _join(_mapRoom(Map<String, dynamic>.from(row as Map)), userId);
+      return _join(_mapRoom(row), userId);
     } catch (e, st) {
-      return Failed(SupabaseMappers.mapError(e, st));
+      final failure = SupabaseMappers.mapError(e, st);
+      if (failure is NotFoundFailure) {
+        return const Failed(NotFoundFailure('Invalid room code.'));
+      }
+      return Failed(failure);
     }
   }
 

@@ -91,6 +91,22 @@ class OrderEntryScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _submit(BuildContext context) async {
+    final cubit = context.read<OrderCubit>();
+    final l10n = context.l10n;
+    if (cubit.state.draftItems.isEmpty) {
+      final ok = await showAppConfirmDialog(
+        context,
+        title: l10n.emptyOrderTitle,
+        message: l10n.emptyOrderBody,
+        confirmLabel: l10n.sendEmptyOrder,
+        icon: Icons.shopping_bag_outlined,
+      );
+      if (ok != true || !context.mounted) return;
+    }
+    await cubit.submit();
+  }
+
   @override
   Widget build(BuildContext context) {
     final room = context.watch<RoomCubit>().state.room!;
@@ -228,7 +244,7 @@ class OrderEntryScreen extends StatelessWidget {
                   PrimaryButton(
                     label: l10n.submitMyOrder,
                     loading: state.loading,
-                    onPressed: () => context.read<OrderCubit>().submit(),
+                    onPressed: () => _submit(context),
                   ),
                 const SizedBox(height: 8),
                 SecondaryButton(

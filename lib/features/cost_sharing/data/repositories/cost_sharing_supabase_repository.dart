@@ -149,6 +149,15 @@ class CostSharingSupabaseRepository implements CostSharingRepository {
   }
 
   @override
+  Future<Result<CostShareDraft?>> getCostShare(String roomId) async {
+    try {
+      return Success(await _loadDraft(roomId));
+    } catch (e, st) {
+      return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
+  @override
   Stream<CostShareDraft> watchCostShare(String roomId) {
     late StreamController<CostShareDraft> controller;
     final subs = <StreamSubscription<dynamic>>[];
@@ -228,48 +237,19 @@ class CostSharingSupabaseRepository implements CostSharingRepository {
       ));
     }
 
-    final expected = orderList.fold<double>(0, (s, o) => s + o.subtotal);
-    final memberCount = orderList.isEmpty ? 1 : orderList.length;
-    final extrasPer = extras.netExtras / memberCount;
-    final diff = receiptTotal - (expected + extras.netExtras);
-    final diffPer = diff / memberCount;
-
-    final shares = orderList.map((o) {
-      final adj = adjustments?[o.userId] ?? 0;
-      final finalAmount = o.subtotal + extrasPer + diffPer + adj;
-      return ParticipantShare(
-        userId: o.userId,
-        displayName: o.displayName,
-        orderSubtotal: o.subtotal,
-        extrasShare: extrasPer + diffPer,
-        adjustment: adj,
-        finalAmount: double.parse(finalAmount.toStringAsFixed(2)),
-      );
-    }).toList();
-
-    if (shares.isNotEmpty) {
-      final sum = shares.fold<double>(0, (s, p) => s + p.finalAmount);
-      final delta = double.parse((receiptTotal - sum).toStringAsFixed(2));
-      if (delta != 0) {
-        final last = shares.last;
-        shares[shares.length - 1] = ParticipantShare(
-          userId: last.userId,
-          displayName: last.displayName,
-          orderSubtotal: last.orderSubtotal,
-          extrasShare: last.extrasShare,
-          adjustment: last.adjustment + delta,
-          finalAmount:
-              double.parse((last.finalAmount + delta).toStringAsFixed(2)),
-        );
-      }
-    }
-
-    return CostShareDraft(
+    return CostShareDraft.fromOrders(
       roomId: roomId,
       receiptTotal: receiptTotal,
-      expectedOrdersTotal: expected,
       additionalCosts: extras,
-      shares: shares,
+      adjustments: adjustments,
+      orders: [
+        for (final o in orderList)
+          (
+            userId: o.userId,
+            displayName: o.displayName,
+            subtotal: o.subtotal,
+          ),
+      ],
     );
   }
 

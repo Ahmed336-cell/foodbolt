@@ -9,6 +9,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/deep_link/presentation/cubit/deep_link_cubit.dart';
+import '../../features/history/presentation/screens/history_detail_screen.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -87,6 +88,13 @@ GoRouter createRouter({String initialLocation = '/splash'}) {
       ),
       GoRoute(path: '/join-room', builder: (_, __) => const JoinRoomScreen()),
       GoRoute(path: '/history', builder: (_, __) => const HistoryScreen()),
+      GoRoute(
+        path: '/history/:roomId',
+        builder: (context, state) {
+          final roomId = state.pathParameters['roomId']!;
+          return HistoryDetailScreen(roomId: roomId);
+        },
+      ),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
       GoRoute(
         path: '/join/:token',

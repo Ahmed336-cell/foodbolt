@@ -79,6 +79,73 @@ class CostShareDraft extends Equatable {
   double get difference => receiptTotal - expectedOrdersTotal;
   double get sharesTotal => shares.fold(0, (s, p) => s + p.finalAmount);
 
+  /// Empty orders pay 0. Receipt gap split only among people who ordered,
+  /// proportional to their subtotal.
+  factory CostShareDraft.fromOrders({
+    required String roomId,
+    required double receiptTotal,
+    required AdditionalCosts additionalCosts,
+    required List<({String userId, String displayName, double subtotal})>
+        orders,
+    Map<String, double>? adjustments,
+    bool confirmed = false,
+  }) {
+    final expected = orders.fold<double>(0, (s, o) => s + o.subtotal);
+    final pool = receiptTotal;
+    final shares = <ParticipantShare>[];
+
+    for (final o in orders) {
+      final adj = adjustments?[o.userId] ?? 0;
+      late final double pay;
+      if (expected > 0) {
+        pay = o.subtotal <= 0 ? adj : pool * (o.subtotal / expected) + adj;
+      } else {
+        final n = orders.isEmpty ? 1 : orders.length;
+        pay = pool / n + adj;
+      }
+      final extrasShare = pay - adj - o.subtotal;
+      shares.add(
+        ParticipantShare(
+          userId: o.userId,
+          displayName: o.displayName,
+          orderSubtotal: o.subtotal,
+          extrasShare: double.parse(extrasShare.toStringAsFixed(2)),
+          adjustment: adj,
+          finalAmount: double.parse(pay.toStringAsFixed(2)),
+        ),
+      );
+    }
+
+    if (shares.isNotEmpty) {
+      final target = pool;
+      final sum = shares.fold<double>(0, (s, p) => s + p.finalAmount);
+      final delta = double.parse((target - sum).toStringAsFixed(2));
+      if (delta != 0) {
+        var idx = shares.lastIndexWhere((s) => s.orderSubtotal > 0);
+        if (idx < 0) idx = shares.length - 1;
+        final last = shares[idx];
+        shares[idx] = ParticipantShare(
+          userId: last.userId,
+          displayName: last.displayName,
+          orderSubtotal: last.orderSubtotal,
+          extrasShare: last.extrasShare,
+          adjustment: last.adjustment + delta,
+          finalAmount:
+              double.parse((last.finalAmount + delta).toStringAsFixed(2)),
+        );
+      }
+    }
+
+    return CostShareDraft(
+      roomId: roomId,
+      receiptTotal: receiptTotal,
+      expectedOrdersTotal: expected,
+      additionalCosts: additionalCosts,
+      shares: List.unmodifiable(shares),
+      confirmed: confirmed,
+    );
+  }
+
   @override
   List<Object?> get props =>
       [roomId, receiptTotal, expectedOrdersTotal, additionalCosts, shares, confirmed];

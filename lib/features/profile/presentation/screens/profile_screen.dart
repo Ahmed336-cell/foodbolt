@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/localization/failure_messages.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_page.dart';
@@ -32,7 +33,9 @@ class ProfileScreen extends StatelessWidget {
     }
     final error = context.read<AuthCubit>().state.error;
     if (error != null && error.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(FailureMessages.localize(l10n, error))),
+      );
     }
   }
 

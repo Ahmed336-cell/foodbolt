@@ -206,10 +206,11 @@ class _RestaurantSuggestionScreenState extends State<RestaurantSuggestionScreen>
                               category: s.category,
                               note: s.note,
                               suggestedByName: s.suggestedByName,
-                              canRemove: s.suggestedBy == user?.id,
+                              canRemove:
+                                  isHost || s.suggestedBy == user?.id,
                               onRemove: () => context
                                   .read<SuggestionCubit>()
-                                  .remove(room.id, s.id),
+                                  .remove(s.roomId, s.id),
                             );
                           },
                         ),

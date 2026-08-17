@@ -46,7 +46,7 @@ class HistoryScreen extends StatelessWidget {
                     subtitle: Text(
                       '${room.createdAt.toLocal().toString().split('.').first} · ${room.code}',
                     ),
-                    onTap: () => context.push('/room/${room.id}'),
+                    onTap: () => context.push('/history/${room.id}'),
                   );
                 },
               ),

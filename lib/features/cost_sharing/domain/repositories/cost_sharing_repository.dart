@@ -9,5 +9,6 @@ abstract class CostSharingRepository {
     Map<String, double>? adjustments,
   });
   Future<Result<CostShareDraft>> confirm(String roomId);
+  Future<Result<CostShareDraft?>> getCostShare(String roomId);
   Stream<CostShareDraft> watchCostShare(String roomId);
 }

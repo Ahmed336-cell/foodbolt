@@ -171,6 +171,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get historySubtitle => 'الغرف والفواتير السابقة';
 
   @override
+  String get historyDetailTitle => 'طلب سابق';
+
+  @override
+  String get historyNoReceipt => 'لا توجد صورة إيصال';
+
+  @override
   String get nameYourHangout => 'سمِّ الجلسة';
 
   @override
@@ -548,6 +554,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get submitMyOrder => 'إرسال طلبي';
 
   @override
+  String get emptyOrderTitle => 'لم تضف طلبًا';
+
+  @override
+  String get emptyOrderBody =>
+      'قائمة الأصناف فارغة. هل تريد إرسال طلب فارغ؟ سيظهر للمجموعة أنك لا تطلب طعامًا.';
+
+  @override
+  String get sendEmptyOrder => 'إرسال طلب فارغ';
+
+  @override
   String get orderSubmitted => 'تم إرسال طلبك.';
 
   @override
@@ -858,6 +874,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errRoomNotFound => 'الغرفة غير موجودة.';
 
   @override
+  String get errRestaurantNotFound => 'المطعم غير موجود.';
+
+  @override
+  String get errRemoveRestaurant => 'تعذر حذف هذا المطعم.';
+
+  @override
   String get errRoomEnded => 'هذه الغرفة انتهت بالفعل.';
 
   @override
@@ -931,6 +953,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errSelectReceiptImage => 'اختر صورة الفاتورة أولاً.';
+
+  @override
+  String get errReceiptUploadFailed => 'تعذر رفع الإيصال. حاول مرة أخرى.';
 
   @override
   String get errRoomNotReady => 'الغرفة غير جاهزة.';

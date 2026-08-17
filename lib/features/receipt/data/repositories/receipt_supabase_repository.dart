@@ -7,6 +7,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/phase/room_phase.dart';
 import '../../../../core/supabase/supabase_mappers.dart';
 import '../../../../core/usecase/usecase.dart';
+import '../../../cost_sharing/domain/entities/cost_share.dart';
 import '../../domain/entities/receipt.dart';
 import '../../domain/repositories/receipt_repository.dart';
 
@@ -49,17 +50,29 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
             ),
           );
 
-      await _client.from('receipts').upsert({
-        'room_id': roomId,
-        'storage_path': storagePath,
-        'total_amount': totalAmount,
-        'uploaded_by': userId,
-        'status': SupabaseMappers.receiptStatusToDb(ReceiptStatus.uploaded),
-      });
-
-      await _client.from('rooms').update({
-        'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.costReview),
-      }).eq('id', roomId);
+      try {
+        await _client.rpc(
+          'save_uploaded_receipt',
+          params: {
+            'p_room_id': roomId,
+            'p_storage_path': storagePath,
+            'p_total': totalAmount,
+            'p_status': 'uploaded',
+          },
+        );
+      } catch (e) {
+        if (!_isMissingSaveReceiptRpc(e)) rethrow;
+        await _client.from('receipts').upsert({
+          'room_id': roomId,
+          'storage_path': storagePath,
+          'total_amount': totalAmount,
+          'uploaded_by': userId,
+          'status': SupabaseMappers.receiptStatusToDb(ReceiptStatus.uploaded),
+        });
+        await _client.from('rooms').update({
+          'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.costReview),
+        }).eq('id', roomId);
+      }
 
       // Best-effort seed of cost draft (host RLS may block non-host writers).
       try {
@@ -71,12 +84,14 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
           roomId: roomId,
           status: ReceiptStatus.uploaded,
           localPath: localPath,
+          storagePath: storagePath,
+          imageUrl: await _signedUrl(storagePath),
           totalAmount: totalAmount,
           uploadedBy: userId,
         ),
       );
     } catch (e, st) {
-      return Failed(SupabaseMappers.mapError(e, st));
+      return Failed(_mapReceiptError(e, st));
     }
   }
 
@@ -182,23 +197,51 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
         .from('receipts')
         .stream(primaryKey: ['room_id'])
         .eq('room_id', roomId)
-        .map((rows) {
-          if (rows.isEmpty) {
-            return Receipt(roomId: roomId, status: ReceiptStatus.none);
-          }
-          final r = rows.first;
-          return Receipt(
-            roomId: roomId,
-            status: SupabaseMappers.receiptStatusFromDb(
-              r['status'] as String?,
-            ),
-            localPath: r['storage_path'] as String?,
-            totalAmount: r['total_amount'] == null
-                ? null
-                : SupabaseMappers.asDouble(r['total_amount']),
-            uploadedBy: r['uploaded_by'] as String?,
+        .asyncMap((rows) => _mapReceiptRow(roomId, rows));
+  }
+
+  @override
+  Future<Result<Receipt>> getReceipt(String roomId) async {
+    try {
+      final rows = await _client
+          .from('receipts')
+          .select()
+          .eq('room_id', roomId)
+          .limit(1);
+      return Success(await _mapReceiptRow(roomId, rows));
+    } catch (e, st) {
+      return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
+  Future<Receipt> _mapReceiptRow(String roomId, List<dynamic> rows) async {
+    if (rows.isEmpty) {
+      return Receipt(roomId: roomId, status: ReceiptStatus.none);
+    }
+    final r = Map<String, dynamic>.from(rows.first as Map);
+    final path = r['storage_path'] as String?;
+    return Receipt(
+      roomId: roomId,
+      status: SupabaseMappers.receiptStatusFromDb(r['status'] as String?),
+      storagePath: path,
+      imageUrl: await _signedUrl(path),
+      totalAmount: r['total_amount'] == null
+          ? null
+          : SupabaseMappers.asDouble(r['total_amount']),
+      uploadedBy: r['uploaded_by'] as String?,
+    );
+  }
+
+  Future<String?> _signedUrl(String? path) async {
+    if (path == null || path.isEmpty) return null;
+    try {
+      return await _client.storage.from('receipts').createSignedUrl(
+            path,
+            60 * 60 * 24,
           );
-        });
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<List<_OrderSubtotal>> _loadSubmittedOrders(String roomId) async {
@@ -233,44 +276,24 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
     required double receiptTotal,
   }) async {
     final orders = await _loadSubmittedOrders(roomId);
-    final expected = orders.fold<double>(0, (s, o) => s + o.subtotal);
-    final memberCount = orders.isEmpty ? 1 : orders.length;
-    final diff = receiptTotal - expected;
-    final diffPer = diff / memberCount;
-
-    final shares = <Map<String, dynamic>>[];
-    for (final o in orders) {
-      final finalAmount =
-          double.parse((o.subtotal + diffPer).toStringAsFixed(2));
-      shares.add({
-        'room_id': roomId,
-        'user_id': o.userId,
-        'order_subtotal': o.subtotal,
-        'extras_share': diffPer,
-        'adjustment': 0,
-        'final_amount': finalAmount,
-      });
-    }
-    if (shares.isNotEmpty) {
-      final sum = shares.fold<double>(
-        0,
-        (s, p) => s + SupabaseMappers.asDouble(p['final_amount']),
-      );
-      final delta = double.parse((receiptTotal - sum).toStringAsFixed(2));
-      if (delta != 0) {
-        final last = shares.last;
-        last['adjustment'] = delta;
-        last['final_amount'] = double.parse(
-          (SupabaseMappers.asDouble(last['final_amount']) + delta)
-              .toStringAsFixed(2),
-        );
-      }
-    }
+    final draft = CostShareDraft.fromOrders(
+      roomId: roomId,
+      receiptTotal: receiptTotal,
+      additionalCosts: const AdditionalCosts(),
+      orders: [
+        for (final o in orders)
+          (
+            userId: o.userId,
+            displayName: o.userId,
+            subtotal: o.subtotal,
+          ),
+      ],
+    );
 
     await _client.from('cost_shares').upsert({
       'room_id': roomId,
       'receipt_total': receiptTotal,
-      'expected_orders_total': expected,
+      'expected_orders_total': draft.expectedOrdersTotal,
       'delivery_fee': 0,
       'service_fee': 0,
       'tax': 0,
@@ -281,9 +304,38 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
     });
 
     await _client.from('participant_shares').delete().eq('room_id', roomId);
-    if (shares.isNotEmpty) {
-      await _client.from('participant_shares').insert(shares);
+    if (draft.shares.isNotEmpty) {
+      await _client.from('participant_shares').insert([
+        for (final s in draft.shares)
+          {
+            'room_id': roomId,
+            'user_id': s.userId,
+            'order_subtotal': s.orderSubtotal,
+            'extras_share': s.extrasShare,
+            'adjustment': s.adjustment,
+            'final_amount': s.finalAmount,
+          },
+      ]);
     }
+  }
+
+  bool _isMissingSaveReceiptRpc(Object error) {
+    final text = error.toString().toLowerCase();
+    return text.contains('save_uploaded_receipt') &&
+        (text.contains('does not exist') ||
+            text.contains('42883') ||
+            text.contains('pgrst202') ||
+            text.contains('could not find the function'));
+  }
+
+  Failure _mapReceiptError(Object error, StackTrace stackTrace) {
+    final text = error.toString().toLowerCase();
+    if (text.contains('row-level security') ||
+        text.contains('bucket not found') ||
+        text.contains('not found') && text.contains('receipts')) {
+      return const PermissionFailure("Couldn't upload the receipt. Try again.");
+    }
+    return SupabaseMappers.mapError(error, stackTrace);
   }
 }
 

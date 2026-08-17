@@ -82,6 +82,11 @@ class OrderMockRepository implements OrderRepository {
   }
 
   @override
+  Future<Result<List<UserOrder>>> getOrders(String roomId) async {
+    return Success(List.unmodifiable(_store.orders[roomId] ?? const []));
+  }
+
+  @override
   Stream<List<UserOrder>> watchOrders(String roomId) =>
       _store.watchOrders(roomId);
 }
