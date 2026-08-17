@@ -90,11 +90,12 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     const LanguageSwitch(compact: true),
                     const Spacer(),
-                    IconButton(
-                      onPressed: () => context.push('/history'),
-                      icon: const Icon(Icons.history_rounded),
-                      tooltip: l10n.historyTitle,
-                    ),
+                    if (user?.isGuest != true)
+                      IconButton(
+                        onPressed: () => context.push('/history'),
+                        icon: const Icon(Icons.history_rounded),
+                        tooltip: l10n.historyTitle,
+                      ),
                     IconButton(
                       onPressed: () => context.push('/profile'),
                       icon: const Icon(Icons.person_outline_rounded),
@@ -243,17 +244,19 @@ class _HomeScreenState extends State<HomeScreen>
                                     onTap: () => context.push('/join-room'),
                                   ),
                                 ],
-                                const SizedBox(height: 8),
-                                TextButton(
-                                  onPressed: () => context.push('/history'),
-                                  child: Text(
-                                    l10n.historyTitle,
-                                    style: GoogleFonts.sora(
-                                      fontWeight: FontWeight.w700,
-                                      color: AppTheme.textSecondary,
+                                if (user?.isGuest != true) ...[
+                                  const SizedBox(height: 8),
+                                  TextButton(
+                                    onPressed: () => context.push('/history'),
+                                    child: Text(
+                                      l10n.historyTitle,
+                                      style: GoogleFonts.sora(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppTheme.textSecondary,
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ],
                             ),
                           );

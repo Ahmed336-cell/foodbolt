@@ -24,6 +24,7 @@ class AuthState extends Equatable {
   final bool initialized;
 
   bool get isAuthenticated => user != null;
+  bool get isGuest => user?.isGuest == true;
 
   AuthState copyWith({
     AppUser? user,

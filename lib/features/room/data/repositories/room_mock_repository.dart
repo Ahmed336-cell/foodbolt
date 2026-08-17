@@ -182,6 +182,8 @@ class RoomMockRepository implements RoomRepository {
   Future<Result<List<Room>>> getHistory() async {
     final userResult = _store.requireUser();
     if (userResult case Failed(:final failure)) return Failed(failure);
-    return Success(_store.historyForUser(userResult.dataOrNull!.id));
+    final user = userResult.dataOrNull!;
+    if (user.isGuest) return const Success([]);
+    return Success(_store.historyForUser(user.id));
   }
 }

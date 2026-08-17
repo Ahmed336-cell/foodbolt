@@ -70,6 +70,7 @@ GoRouter createRouter({String initialLocation = '/splash'}) {
           (loc == '/welcome' || loc == '/login' || loc == '/guest')) {
         return '/home';
       }
+      if (auth.isGuest && loc.startsWith('/history')) return '/home';
       return null;
     },
     routes: [

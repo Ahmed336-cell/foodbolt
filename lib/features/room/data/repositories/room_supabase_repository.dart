@@ -298,6 +298,13 @@ class RoomSupabaseRepository implements RoomRepository {
     final userId = SupabaseMappers.requireUserId(_client);
     if (userId == null) return const Failed(AuthFailure());
     try {
+      final profile = await _client
+          .from('profiles')
+          .select('is_guest')
+          .eq('id', userId)
+          .maybeSingle();
+      if (profile?['is_guest'] == true) return const Success([]);
+
       final memberships = await _client
           .from('room_members')
           .select('room_id')
