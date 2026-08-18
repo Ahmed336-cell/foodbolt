@@ -43,10 +43,10 @@ class CostSharingMockRepository implements CostSharingRepository {
       return const Failed(ValidationFailure('Calculate the split first.'));
     }
     final sum = draft.sharesTotal;
-    if ((sum - draft.receiptTotal).abs() > 0.05) {
+    if ((sum - draft.payableTotal).abs() > 0.05) {
       return Failed(
         ValidationFailure(
-          'Shares ($sum) must equal receipt (${draft.receiptTotal}).',
+          'Shares ($sum) must equal receipt (${draft.payableTotal}).',
         ),
       );
     }

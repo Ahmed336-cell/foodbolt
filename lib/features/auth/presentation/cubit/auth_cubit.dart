@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/usecase/usecase.dart';
+import '../../../../core/avatar/app_avatars.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/auth_usecases.dart';
@@ -110,10 +111,20 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   /// Returns true when account was created — caller should switch to login.
-  Future<bool> register(String email, String password, String name) async {
+  Future<bool> register(
+    String email,
+    String password,
+    String name, {
+    String avatar = AppAvatars.defaultId,
+  }) async {
     emit(state.copyWith(loading: true, clearError: true, clearInfo: true));
     final result = await _registerUser(
-      RegisterParams(email: email, password: password, displayName: name),
+      RegisterParams(
+        email: email,
+        password: password,
+        displayName: name,
+        avatar: avatar,
+      ),
     );
     return result.fold(
       (f) {
@@ -135,9 +146,14 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<bool> continueAsGuest(String name) async {
+  Future<bool> continueAsGuest(
+    String name, {
+    String avatar = AppAvatars.defaultId,
+  }) async {
     emit(state.copyWith(loading: true, clearError: true));
-    final result = await _continueAsGuest(name);
+    final result = await _continueAsGuest(
+      GuestParams(displayName: name, avatar: avatar),
+    );
     return result.fold(
       (f) {
         emit(state.copyWith(loading: false, error: f.message));

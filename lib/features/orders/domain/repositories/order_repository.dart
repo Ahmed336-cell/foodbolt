@@ -9,6 +9,10 @@ abstract class OrderRepository {
     required bool submit,
   });
   Future<Result<void>> lockOrders(String roomId);
+  Future<Result<void>> updateItemPrice({
+    required String itemId,
+    required double price,
+  });
   Future<Result<List<UserOrder>>> getOrders(String roomId);
   Stream<List<UserOrder>> watchOrders(String roomId);
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/deep_link/invite_links.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/phase/room_phase.dart';
@@ -128,7 +128,7 @@ class _RoomSessionScreenState extends State<RoomSessionScreen> {
                   ErrorBanner(message: state.error!),
                   PrimaryButton(
                     label: 'Back Home',
-                    onPressed: () => context.go('/home'),
+                    onPressed: () => leaveToHomeOrOnboarding(context),
                   ),
                 ],
               ),

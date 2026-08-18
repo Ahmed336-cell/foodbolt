@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -187,12 +189,82 @@ class OrderSupabaseRepository implements OrderRepository {
   }
 
   @override
+  Future<Result<void>> updateItemPrice({
+    required String itemId,
+    required double price,
+  }) async {
+    final userId = SupabaseMappers.requireUserId(_client);
+    if (userId == null) return const Failed(AuthFailure());
+    if (price < 0) {
+      return const Failed(ValidationFailure('Enter a valid price.'));
+    }
+
+    try {
+      try {
+        await _client.rpc(
+          'update_order_item_price',
+          params: {'p_item_id': itemId, 'p_price': price},
+        );
+      } catch (e) {
+        if (!_isMissingPriceRpc(e)) rethrow;
+        await _client
+            .from('order_items')
+            .update({'price': price})
+            .eq('id', itemId);
+      }
+      return const Success(null);
+    } catch (e, st) {
+      return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
+  bool _isMissingPriceRpc(Object error) {
+    final text = error.toString().toLowerCase();
+    return text.contains('update_order_item_price') &&
+        (text.contains('does not exist') ||
+            text.contains('42883') ||
+            text.contains('pgrst202') ||
+            text.contains('could not find the function'));
+  }
+
+  @override
   Stream<List<UserOrder>> watchOrders(String roomId) {
-    return _client
-        .from('orders')
-        .stream(primaryKey: ['id'])
-        .eq('room_id', roomId)
-        .asyncMap((_) => _loadOrders(roomId));
+    late StreamController<List<UserOrder>> controller;
+    final subs = <StreamSubscription<dynamic>>[];
+
+    Future<void> push() async {
+      if (controller.isClosed) return;
+      try {
+        controller.add(await _loadOrders(roomId));
+      } catch (_) {}
+    }
+
+    controller = StreamController<List<UserOrder>>(
+      onListen: () {
+        push();
+        subs.add(
+          _client
+              .from('orders')
+              .stream(primaryKey: ['id'])
+              .eq('room_id', roomId)
+              .listen((_) => push()),
+        );
+        subs.add(
+          _client
+              .from('order_items')
+              .stream(primaryKey: ['id'])
+              .listen((_) => push()),
+        );
+      },
+      onCancel: () async {
+        for (final s in subs) {
+          await s.cancel();
+        }
+        await controller.close();
+      },
+    );
+
+    return controller.stream;
   }
 
   Future<List<UserOrder>> _loadOrders(String roomId) async {

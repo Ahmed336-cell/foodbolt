@@ -314,6 +314,24 @@ abstract class AppLocalizations {
   /// **'Guest mode, no account needed.'**
   String get guestSubtitle;
 
+  /// No description provided for @guestEphemeralHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a name and avatar. Nothing is saved after the room ends.'**
+  String get guestEphemeralHint;
+
+  /// No description provided for @pickAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick an avatar'**
+  String get pickAvatar;
+
+  /// No description provided for @shuffleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest another name'**
+  String get shuffleName;
+
   /// No description provided for @guest.
   ///
   /// In en, this message translates to:
@@ -1106,6 +1124,24 @@ abstract class AppLocalizations {
   /// **'Price (EGP)'**
   String get priceEgp;
 
+  /// No description provided for @editPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit price'**
+  String get editPrice;
+
+  /// No description provided for @savePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Save price'**
+  String get savePrice;
+
+  /// No description provided for @hostEditPriceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a price to correct it.'**
+  String get hostEditPriceHint;
+
   /// No description provided for @notes.
   ///
   /// In en, this message translates to:
@@ -1397,13 +1433,19 @@ abstract class AppLocalizations {
   /// No description provided for @skipReceiptHint.
   ///
   /// In en, this message translates to:
-  /// **'Everyone pays for their own order.'**
+  /// **'Skip the photo. You can still add delivery and fees.'**
   String get skipReceiptHint;
+
+  /// No description provided for @skipReceiptFeesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No receipt photo — add delivery, service, tax, or discount below.'**
+  String get skipReceiptFeesHint;
 
   /// No description provided for @payOwnOrderBanner.
   ///
   /// In en, this message translates to:
-  /// **'No receipt — everyone pays their own order.'**
+  /// **'No receipt photo — split uses orders plus any fees.'**
   String get payOwnOrderBanner;
 
   /// No description provided for @costSharing.

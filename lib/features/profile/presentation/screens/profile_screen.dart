@@ -55,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             AvatarCircle(
               name: user.displayName,
-              color: user.avatarColor,
+              avatar: user.avatar,
               size: 84,
             ),
             const SizedBox(height: 16),

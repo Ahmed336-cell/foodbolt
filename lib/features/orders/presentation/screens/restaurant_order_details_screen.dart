@@ -8,10 +8,12 @@ import '../../../../core/phase/room_phase.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
+import '../../../../core/widgets/numeric_input.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../room/presentation/cubit/room_cubit.dart';
 import '../../../suggestions/presentation/cubit/suggestion_cubit.dart';
 import '../../domain/aggregate_order_items.dart';
+import '../../domain/entities/user_order.dart';
 import '../../domain/repositories/saved_orders_repository.dart';
 import '../cubit/order_cubit.dart';
 
@@ -31,6 +33,46 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
   Future<void> _share(String text) async {
     if (text.isEmpty) return;
     await SharePlus.instance.share(ShareParams(text: text));
+  }
+
+  Future<void> _editPrice(BuildContext context, OrderItem item) async {
+    final controller = TextEditingController(
+      text: item.price == 0
+          ? ''
+          : item.price.toStringAsFixed(
+              item.price.truncateToDouble() == item.price ? 0 : 2,
+            ),
+    );
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.l10n.editPrice),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: NumericInput.decimalKeyboard,
+          inputFormatters: NumericInput.decimal,
+          decoration: InputDecoration(
+            labelText: ctx.l10n.priceEgp,
+            hintText: item.name,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(ctx.l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(ctx.l10n.savePrice),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    final price = double.tryParse(controller.text.replaceAll(',', ''));
+    if (price == null || price < 0) return;
+    await context.read<OrderCubit>().updateItemPrice(item.id, price);
   }
 
   @override
@@ -211,6 +253,17 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
+                      if (isHost)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            l10n.hostEditPriceHint,
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
                       ...submitted.map(
                         (o) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
@@ -228,10 +281,11 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 6),
                                   ...o.items.map(
-                                    (item) => Text(
-                                      '• ${item.name} ×${item.quantity} — '
-                                      '${item.lineTotal.toStringAsFixed(0)} ${l10n.currency}'
-                                      '${item.notes == null || item.notes!.isEmpty ? '' : ' (${item.notes})'}',
+                                    (item) => _ItemPriceRow(
+                                      item: item,
+                                      currency: l10n.currency,
+                                      canEdit: isHost,
+                                      onEdit: () => _editPrice(context, item),
                                     ),
                                   ),
                                   Align(
@@ -288,5 +342,45 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _ItemPriceRow extends StatelessWidget {
+  const _ItemPriceRow({
+    required this.item,
+    required this.currency,
+    required this.canEdit,
+    required this.onEdit,
+  });
+
+  final OrderItem item;
+  final String currency;
+  final bool canEdit;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final notes = item.notes == null || item.notes!.isEmpty
+        ? ''
+        : ' (${item.notes})';
+    final line =
+        '• ${item.name} ×${item.quantity} — ${item.lineTotal.toStringAsFixed(0)} $currency$notes';
+    final row = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Expanded(child: Text(line)),
+          if (canEdit)
+            IconButton(
+              tooltip: context.l10n.editPrice,
+              onPressed: onEdit,
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              visualDensity: VisualDensity.compact,
+            ),
+        ],
+      ),
+    );
+    if (!canEdit) return row;
+    return InkWell(onTap: onEdit, child: row);
   }
 }

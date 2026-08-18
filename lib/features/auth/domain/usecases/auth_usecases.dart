@@ -34,6 +34,7 @@ class RegisterUser extends UseCase<SignUpCompleted, RegisterParams> {
         email: params.email,
         password: params.password,
         displayName: params.displayName,
+        avatar: params.avatar,
       );
 }
 
@@ -42,19 +43,29 @@ class RegisterParams {
     required this.email,
     required this.password,
     required this.displayName,
+    required this.avatar,
   });
   final String email;
   final String password;
   final String displayName;
+  final String avatar;
 }
 
-class ContinueAsGuest extends UseCase<AppUser, String> {
+class ContinueAsGuest extends UseCase<AppUser, GuestParams> {
   ContinueAsGuest(this._repo);
   final AuthRepository _repo;
 
   @override
-  Future<Result<AppUser>> call(String displayName) =>
-      _repo.continueAsGuest(displayName: displayName);
+  Future<Result<AppUser>> call(GuestParams params) => _repo.continueAsGuest(
+        displayName: params.displayName,
+        avatar: params.avatar,
+      );
+}
+
+class GuestParams {
+  const GuestParams({required this.displayName, required this.avatar});
+  final String displayName;
+  final String avatar;
 }
 
 class LogoutUser extends UseCase<void, NoParams> {

@@ -33,14 +33,17 @@ class SettingsCubit extends Cubit<SettingsState> {
     required LoadSettings loadSettings,
     required SaveLocale saveLocale,
     required CompleteOnboarding completeOnboarding,
+    required ResetOnboarding resetOnboarding,
   })  : _loadSettings = loadSettings,
         _saveLocale = saveLocale,
         _completeOnboarding = completeOnboarding,
+        _resetOnboarding = resetOnboarding,
         super(const SettingsState());
 
   final LoadSettings _loadSettings;
   final SaveLocale _saveLocale;
   final CompleteOnboarding _completeOnboarding;
+  final ResetOnboarding _resetOnboarding;
 
   Future<void> load() async {
     final settings = await _loadSettings();
@@ -71,5 +74,16 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (_) {
       // Still leave onboarding marked done in memory so navigation proceeds.
     }
+  }
+
+  Future<void> resetOnboarding() async {
+    emit(
+      state.copyWith(
+        settings: state.settings.copyWith(onboardingSeen: false),
+      ),
+    );
+    try {
+      await _resetOnboarding();
+    } catch (_) {}
   }
 }

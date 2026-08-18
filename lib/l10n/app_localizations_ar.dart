@@ -120,6 +120,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestSubtitle => 'وضع الضيف، بدون حساب.';
 
   @override
+  String get guestEphemeralHint =>
+      'اختر اسماً وشخصية. لا يُحفظ شيء بعد انتهاء الغرفة.';
+
+  @override
+  String get pickAvatar => 'اختر شخصية';
+
+  @override
+  String get shuffleName => 'اقترح اسماً آخر';
+
+  @override
   String get guest => 'ضيف';
 
   @override
@@ -545,6 +555,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get priceEgp => 'السعر (ج.م)';
 
   @override
+  String get editPrice => 'تعديل السعر';
+
+  @override
+  String get savePrice => 'حفظ السعر';
+
+  @override
+  String get hostEditPriceHint => 'اضغط على سعر لتصحيحه.';
+
+  @override
   String get notes => 'ملاحظات';
 
   @override
@@ -699,10 +718,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get skipReceipt => 'تخطي الإيصال';
 
   @override
-  String get skipReceiptHint => 'كل واحد يدفع طلبه.';
+  String get skipReceiptHint =>
+      'تخطَّ الصورة. يمكنك إضافة التوصيل والرسوم بعد ذلك.';
 
   @override
-  String get payOwnOrderBanner => 'بدون إيصال — كل واحد يدفع طلبه.';
+  String get skipReceiptFeesHint =>
+      'بدون صورة إيصال — أضف التوصيل أو الخدمة أو الضريبة أو الخصم بالأسفل.';
+
+  @override
+  String get payOwnOrderBanner =>
+      'بدون صورة إيصال — التقسيم حسب الطلبات وأي رسوم.';
 
   @override
   String get costSharing => 'تقسيم التكلفة';

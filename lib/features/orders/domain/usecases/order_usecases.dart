@@ -34,6 +34,21 @@ class LockOrders extends UseCase<void, String> {
   Future<Result<void>> call(String roomId) => _repo.lockOrders(roomId);
 }
 
+class UpdateOrderItemPrice extends UseCase<void, UpdateItemPriceParams> {
+  UpdateOrderItemPrice(this._repo);
+  final OrderRepository _repo;
+
+  @override
+  Future<Result<void>> call(UpdateItemPriceParams params) =>
+      _repo.updateItemPrice(itemId: params.itemId, price: params.price);
+}
+
+class UpdateItemPriceParams {
+  const UpdateItemPriceParams({required this.itemId, required this.price});
+  final String itemId;
+  final double price;
+}
+
 class GetMyOrder extends UseCase<UserOrder, String> {
   GetMyOrder(this._repo);
   final OrderRepository _repo;

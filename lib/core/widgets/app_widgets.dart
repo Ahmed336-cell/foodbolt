@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../avatar/app_avatars.dart';
 import '../localization/failure_messages.dart';
 import '../localization/l10n_extension.dart';
 import '../theme/app_theme.dart';
@@ -138,26 +139,27 @@ class AvatarCircle extends StatelessWidget {
   const AvatarCircle({
     super.key,
     required this.name,
-    required this.color,
+    this.avatar,
+    this.color,
     this.size = 44,
   });
 
   final String name;
-  final int color;
+  final String? avatar;
+  final int? color;
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    return CircleAvatar(
-      radius: size / 2,
-      backgroundColor: Colors.deepOrange,
-      child: Text(
-        initial,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: size * 0.4,
+    final picked = AppAvatars.byId(avatar);
+    return Semantics(
+      label: name,
+      child: CircleAvatar(
+        radius: size / 2,
+        backgroundColor: Color(color ?? picked.color),
+        child: Text(
+          picked.emoji,
+          style: TextStyle(fontSize: size * 0.42),
         ),
       ),
     );

@@ -77,19 +77,9 @@ class WelcomeScreen extends StatelessWidget {
           label: l10n.joinRoom,
           onPressed: () => context.push('/guest', extra: 'join'),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () => context.push('/login'),
-              child: Text(l10n.loginOrSignIn),
-            ),
-            const Text('·', style: TextStyle(color: AppTheme.textSecondary)),
-            TextButton(
-              onPressed: () => context.push('/guest'),
-              child: Text(l10n.continueAsGuest),
-            ),
-          ],
+        TextButton(
+          onPressed: () => context.push('/login'),
+          child: Text(l10n.loginOrSignIn),
         ),
       ],
     );

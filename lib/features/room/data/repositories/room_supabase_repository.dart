@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/avatar/app_avatars.dart';
 import '../../../../core/deep_link/invite_links.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/phase/room_phase.dart';
@@ -275,7 +276,7 @@ class RoomSupabaseRepository implements RoomRepository {
       final rows = await _client
           .from('room_members')
           .select(
-            'user_id, role, is_online, joined_at, profiles(display_name, avatar_color, is_guest)',
+            'user_id, role, is_online, joined_at, profiles(display_name, avatar, avatar_color, is_guest)',
           )
           .eq('room_id', roomId)
           .order('joined_at');
@@ -362,7 +363,7 @@ class RoomSupabaseRepository implements RoomRepository {
     return RoomMember(
       userId: row['user_id'] as String,
       displayName: profileMap['display_name'] as String? ?? 'User',
-      avatarColor: SupabaseMappers.asInt(profileMap['avatar_color'], 0xFFE85D04),
+      avatar: AppAvatars.byId(profileMap['avatar'] as String?).id,
       role: (row['role'] as String?) == 'host' ? MemberRole.host : MemberRole.member,
       isGuest: profileMap['is_guest'] as bool? ?? false,
       isOnline: row['is_online'] as bool? ?? true,

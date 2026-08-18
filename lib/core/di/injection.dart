@@ -204,6 +204,7 @@ void _registerUseCasesAndCubits() {
   sl.registerLazySingleton(() => GetMyOrder(sl()));
   sl.registerLazySingleton(() => SubmitOrder(sl()));
   sl.registerLazySingleton(() => LockOrders(sl()));
+  sl.registerLazySingleton(() => UpdateOrderItemPrice(sl()));
   sl.registerLazySingleton(() => UploadReceipt(sl()));
   sl.registerLazySingleton(() => SkipReceipt(sl()));
   sl.registerLazySingleton(() => CalculateCostSharing(sl()));
@@ -228,11 +229,13 @@ void _registerUseCasesAndCubits() {
   sl.registerLazySingleton(() => LoadSettings(sl()));
   sl.registerLazySingleton(() => SaveLocale(sl()));
   sl.registerLazySingleton(() => CompleteOnboarding(sl()));
+  sl.registerLazySingleton(() => ResetOnboarding(sl()));
   sl.registerLazySingleton(
     () => SettingsCubit(
       loadSettings: sl(),
       saveLocale: sl(),
       completeOnboarding: sl(),
+      resetOnboarding: sl(),
     ),
   );
 
@@ -277,6 +280,7 @@ void _registerUseCasesAndCubits() {
       getMyOrder: sl(),
       submitOrder: sl(),
       lockOrders: sl(),
+      updateOrderItemPrice: sl(),
     ),
   );
   sl.registerFactory(

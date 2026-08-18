@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_page.dart';
@@ -261,7 +261,7 @@ class RoomSummaryScreen extends StatelessWidget {
             const Spacer(),
             PrimaryButton(
               label: l10n.backToHome,
-              onPressed: () => context.go('/home'),
+              onPressed: () => leaveToHomeOrOnboarding(context),
             ),
           ],
         ),

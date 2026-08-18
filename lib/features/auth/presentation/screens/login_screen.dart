@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/avatar/app_avatars.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/responsive/breakpoints.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_widgets.dart';
+import '../../../../core/widgets/avatar_picker.dart';
 import '../../../settings/presentation/widgets/language_switch.dart';
 import '../cubit/auth_cubit.dart';
 
@@ -23,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _name = TextEditingController();
   bool _register = false;
   bool _obscure = true;
+  String _avatarId = AppAvatars.random().id;
 
   @override
   void dispose() {
@@ -36,7 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
     final cubit = context.read<AuthCubit>();
     if (_register) {
       final ok =
-          await cubit.register(_email.text, _password.text, _name.text);
+          await cubit.register(
+            _email.text,
+            _password.text,
+            _name.text,
+            avatar: _avatarId,
+          );
       if (!ok || !mounted) return;
       setState(() => _register = false);
       return;
@@ -122,10 +130,28 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: _register
                                 ? Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
-                                    child: _AuthField(
-                                      controller: _name,
-                                      hint: l10n.displayName,
-                                      icon: Icons.person_outline,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          l10n.pickAvatar,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        AvatarPicker(
+                                          selectedId: _avatarId,
+                                          onSelected: (id) => setState(
+                                            () => _avatarId = id,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _AuthField(
+                                          controller: _name,
+                                          hint: l10n.displayName,
+                                          icon: Icons.person_outline,
+                                        ),
+                                      ],
                                     ),
                                   )
                                 : const SizedBox(width: double.infinity),
@@ -169,11 +195,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: AppTheme.primary,
                               ),
                             ),
-                          ),
-                          const Divider(height: 24),
-                          SecondaryButton(
-                            label: l10n.continueAsGuest,
-                            onPressed: () => context.push('/guest'),
                           ),
                         ],
                       ),

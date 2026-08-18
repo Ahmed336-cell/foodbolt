@@ -102,10 +102,10 @@ class CostSharingSupabaseRepository implements CostSharingRepository {
       }
 
       final sum = draft.sharesTotal;
-      if ((sum - draft.receiptTotal).abs() > 0.05) {
+      if ((sum - draft.payableTotal).abs() > 0.05) {
         return Failed(
           ValidationFailure(
-            'Shares ($sum) must equal receipt (${draft.receiptTotal}).',
+            'Shares ($sum) must equal receipt (${draft.payableTotal}).',
           ),
         );
       }
@@ -205,37 +205,38 @@ class CostSharingSupabaseRepository implements CostSharingRepository {
     required AdditionalCosts extras,
     Map<String, double>? adjustments,
   }) async {
+    final memberRows = await _client
+        .from('room_members')
+        .select('user_id')
+        .eq('room_id', roomId);
+    final userIds = <String>{
+      for (final m in memberRows as List) m['user_id'] as String,
+    };
+
     final orderRows = await _client
         .from('orders')
         .select('id, user_id')
         .eq('room_id', roomId)
         .eq('submitted', true);
 
-    final orderList = <({String userId, String displayName, double subtotal})>[];
-    final userIds = <String>{
-      for (final o in orderRows as List) o['user_id'] as String,
-    };
-    final names = await _profileNames(userIds);
-
+    final subtotals = <String, double>{};
     for (final o in orderRows as List) {
+      final uid = o['user_id'] as String;
+      userIds.add(uid);
       final items = await _client
           .from('order_items')
           .select('quantity, price')
           .eq('order_id', o['id'] as String);
-      final subtotal = (items as List).fold<double>(
+      subtotals[uid] = (items as List).fold<double>(
         0,
         (s, i) =>
             s +
             SupabaseMappers.asInt(i['quantity'], 1) *
                 SupabaseMappers.asDouble(i['price']),
       );
-      final uid = o['user_id'] as String;
-      orderList.add((
-        userId: uid,
-        displayName: names[uid] ?? 'User',
-        subtotal: subtotal,
-      ));
     }
+
+    final names = await _profileNames(userIds);
 
     return CostShareDraft.fromOrders(
       roomId: roomId,
@@ -243,11 +244,11 @@ class CostSharingSupabaseRepository implements CostSharingRepository {
       additionalCosts: extras,
       adjustments: adjustments,
       orders: [
-        for (final o in orderList)
+        for (final uid in userIds)
           (
-            userId: o.userId,
-            displayName: o.displayName,
-            subtotal: o.subtotal,
+            userId: uid,
+            displayName: names[uid] ?? 'User',
+            subtotal: subtotals[uid] ?? 0,
           ),
       ],
     );

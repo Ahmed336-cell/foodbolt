@@ -17,6 +17,21 @@ class OrderItem extends Equatable {
 
   double get lineTotal => quantity * price;
 
+  OrderItem copyWith({
+    String? name,
+    int? quantity,
+    double? price,
+    String? notes,
+  }) {
+    return OrderItem(
+      id: id,
+      name: name ?? this.name,
+      quantity: quantity ?? this.quantity,
+      price: price ?? this.price,
+      notes: notes ?? this.notes,
+    );
+  }
+
   @override
   List<Object?> get props => [id, name, quantity, price, notes];
 }

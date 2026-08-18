@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/room/room_code.dart';
@@ -25,7 +26,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go('/home');
+      leaveToHomeOrOnboarding(context);
     }
   }
 

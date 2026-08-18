@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/avatar/app_avatars.dart';
 import '../../../../core/phase/room_phase.dart';
 
 class RoomSettings extends Equatable {
@@ -106,7 +107,7 @@ class RoomMember extends Equatable {
   const RoomMember({
     required this.userId,
     required this.displayName,
-    required this.avatarColor,
+    required this.avatar,
     required this.role,
     required this.isGuest,
     required this.isOnline,
@@ -115,17 +116,20 @@ class RoomMember extends Equatable {
 
   final String userId;
   final String displayName;
-  final int avatarColor;
+  /// Catalog id, e.g. `ninja`.
+  final String avatar;
   final MemberRole role;
   final bool isGuest;
   final bool isOnline;
   final DateTime joinedAt;
 
+  int get avatarColor => AppAvatars.byId(avatar).color;
+
   RoomMember copyWith({bool? isOnline}) {
     return RoomMember(
       userId: userId,
       displayName: displayName,
-      avatarColor: avatarColor,
+      avatar: avatar,
       role: role,
       isGuest: isGuest,
       isOnline: isOnline ?? this.isOnline,
@@ -135,5 +139,5 @@ class RoomMember extends Equatable {
 
   @override
   List<Object?> get props =>
-      [userId, displayName, avatarColor, role, isGuest, isOnline, joinedAt];
+      [userId, displayName, avatar, role, isGuest, isOnline, joinedAt];
 }

@@ -40,7 +40,7 @@ class RoomMockRepository implements RoomRepository {
       RoomMember(
         userId: user.id,
         displayName: user.displayName,
-        avatarColor: user.avatarColor,
+        avatar: user.avatar,
         role: MemberRole.host,
         isGuest: user.isGuest,
         isOnline: true,
@@ -102,7 +102,7 @@ class RoomMockRepository implements RoomRepository {
       RoomMember(
         userId: user.id,
         displayName: user.displayName,
-        avatarColor: user.avatarColor,
+        avatar: user.avatar,
         role: MemberRole.member,
         isGuest: user.isGuest,
         isOnline: true,

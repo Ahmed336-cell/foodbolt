@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   children: [
                                     AvatarCircle(
                                       name: user.displayName,
-                                      color: user.avatarColor,
+                                      avatar: user.avatar,
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(

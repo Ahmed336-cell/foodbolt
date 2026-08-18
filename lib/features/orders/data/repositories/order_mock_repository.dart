@@ -82,6 +82,42 @@ class OrderMockRepository implements OrderRepository {
   }
 
   @override
+  Future<Result<void>> updateItemPrice({
+    required String itemId,
+    required double price,
+  }) async {
+    final userResult = _store.requireUser();
+    if (userResult case Failed(:final failure)) return Failed(failure);
+    if (price < 0) {
+      return const Failed(ValidationFailure('Enter a valid price.'));
+    }
+
+    for (final entry in _store.orders.entries) {
+      final list = List<UserOrder>.from(entry.value);
+      var changed = false;
+      for (var i = 0; i < list.length; i++) {
+        final order = list[i];
+        final idx = order.items.indexWhere((it) => it.id == itemId);
+        if (idx < 0) continue;
+        if (_store.rooms[order.roomId]?.hostId != userResult.dataOrNull!.id) {
+          return const Failed(PermissionFailure());
+        }
+        final items = List<OrderItem>.from(order.items);
+        items[idx] = items[idx].copyWith(price: price);
+        list[i] = order.copyWith(items: items);
+        changed = true;
+        break;
+      }
+      if (changed) {
+        _store.orders[entry.key] = list;
+        _store.emitOrders(entry.key);
+        return const Success(null);
+      }
+    }
+    return const Failed(NotFoundFailure());
+  }
+
+  @override
   Future<Result<List<UserOrder>>> getOrders(String roomId) async {
     return Success(List.unmodifiable(_store.orders[roomId] ?? const []));
   }

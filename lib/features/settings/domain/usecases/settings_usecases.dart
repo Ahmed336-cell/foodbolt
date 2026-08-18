@@ -21,3 +21,10 @@ class CompleteOnboarding {
 
   Future<void> call() => _repository.setOnboardingSeen(true);
 }
+
+class ResetOnboarding {
+  ResetOnboarding(this._repository);
+  final SettingsRepository _repository;
+
+  Future<void> call() => _repository.setOnboardingSeen(false);
+}

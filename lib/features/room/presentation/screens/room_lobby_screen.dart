@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_dialog.dart';
@@ -30,7 +30,7 @@ class RoomLobbyScreen extends StatelessWidget {
     if (confirmed != true || !context.mounted) return;
     final ok = await context.read<RoomCubit>().leave(isHost: isHost);
     if (ok && context.mounted) {
-      context.go('/home');
+      await leaveToHomeOrOnboarding(context);
     }
   }
 
@@ -138,7 +138,7 @@ class RoomLobbyScreen extends StatelessWidget {
                           tileColor: Colors.white,
                           leading: AvatarCircle(
                             name: m.displayName,
-                            color: m.avatarColor,
+                            avatar: m.avatar,
                           ),
                           title: Text(m.displayName),
                           subtitle: Text(

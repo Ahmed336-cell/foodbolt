@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../../../core/avatar/app_avatars.dart';
 import '../../../../core/supabase/supabase_mappers.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/app_user.dart';
@@ -12,16 +11,6 @@ import '../../domain/repositories/auth_repository.dart';
 class AuthSupabaseRepository implements AuthRepository {
   AuthSupabaseRepository(this._client);
   final SupabaseClient _client;
-  final _rand = Random();
-
-  static const _avatarColors = <int>[
-    0xFFE85D04,
-    0xFF2D6A4F,
-    0xFF1976D2,
-    0xFF7B1FA2,
-    0xFFC9184A,
-    0xFFEF8354,
-  ];
 
   @override
   Stream<AppUser?> watchAuth() async* {
@@ -80,6 +69,7 @@ class AuthSupabaseRepository implements AuthRepository {
     required String email,
     required String password,
     required String displayName,
+    required String avatar,
   }) async {
     if (email.trim().isEmpty || password.isEmpty || displayName.trim().isEmpty) {
       return const Failed(ValidationFailure('All fields required.'));
@@ -88,7 +78,10 @@ class AuthSupabaseRepository implements AuthRepository {
       final res = await _client.auth.signUp(
         email: email.trim(),
         password: password,
-        data: {'display_name': displayName.trim()},
+        data: {
+          'display_name': displayName.trim(),
+          'avatar': AppAvatars.byId(avatar).id,
+        },
       );
       final user = res.user;
       if (user == null) {
@@ -120,11 +113,19 @@ class AuthSupabaseRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<AppUser>> continueAsGuest({required String displayName}) async {
+  Future<Result<AppUser>> continueAsGuest({
+    required String displayName,
+    required String avatar,
+  }) async {
     final name = displayName.trim().isEmpty ? 'Guest' : displayName.trim();
+    final avatarId = AppAvatars.byId(avatar).id;
     try {
       final res = await _client.auth.signInAnonymously(
-        data: {'display_name': name, 'is_guest': true},
+        data: {
+          'display_name': name,
+          'is_guest': true,
+          'avatar': avatarId,
+        },
       );
       final user = res.user;
       if (user == null) {
@@ -134,6 +135,7 @@ class AuthSupabaseRepository implements AuthRepository {
         userId: user.id,
         displayName: name,
         isGuest: true,
+        avatar: avatarId,
       );
       return Success(profile);
     } catch (e, st) {
@@ -190,6 +192,8 @@ class AuthSupabaseRepository implements AuthRepository {
             'User',
         isGuest: authUser.isAnonymous ||
             authUser.userMetadata?['is_guest'] == true,
+        avatar: (authUser.userMetadata?['avatar'] as String?) ??
+            AppAvatars.defaultId,
       );
     }
     return _mapProfile(row);
@@ -200,18 +204,25 @@ class AuthSupabaseRepository implements AuthRepository {
     required String displayName,
     String? email,
     required bool isGuest,
+    String avatar = AppAvatars.defaultId,
   }) async {
+    final avatarId = AppAvatars.byId(avatar).id;
     final existing = await _client
         .from('profiles')
         .select()
         .eq('id', userId)
         .maybeSingle();
     if (existing != null) {
-      // Refresh display name for guests who rename.
-      if (isGuest && existing['display_name'] != displayName) {
+      final needsName = isGuest && existing['display_name'] != displayName;
+      final needsAvatar = existing['avatar'] != avatarId;
+      if (needsName || needsAvatar) {
         final updated = await _client
             .from('profiles')
-            .update({'display_name': displayName})
+            .update({
+              if (needsName) 'display_name': displayName,
+              if (needsAvatar) 'avatar': avatarId,
+              'avatar_color': AppAvatars.byId(avatarId).color,
+            })
             .eq('id', userId)
             .select()
             .single();
@@ -227,7 +238,8 @@ class AuthSupabaseRepository implements AuthRepository {
           'display_name': displayName,
           'email': email,
           'is_guest': isGuest,
-          'avatar_color': _avatarColors[_rand.nextInt(_avatarColors.length)],
+          'avatar': avatarId,
+          'avatar_color': AppAvatars.byId(avatarId).color,
         })
         .select()
         .single();
@@ -239,7 +251,7 @@ class AuthSupabaseRepository implements AuthRepository {
       id: row['id'] as String,
       displayName: row['display_name'] as String? ?? 'User',
       email: row['email'] as String?,
-      avatarColor: SupabaseMappers.asInt(row['avatar_color'], 0xFFE85D04),
+      avatar: AppAvatars.byId(row['avatar'] as String?).id,
       isGuest: row['is_guest'] as bool? ?? false,
     );
   }

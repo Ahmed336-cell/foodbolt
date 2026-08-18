@@ -120,6 +120,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestSubtitle => 'Guest mode, no account needed.';
 
   @override
+  String get guestEphemeralHint =>
+      'Pick a name and avatar. Nothing is saved after the room ends.';
+
+  @override
+  String get pickAvatar => 'Pick an avatar';
+
+  @override
+  String get shuffleName => 'Suggest another name';
+
+  @override
   String get guest => 'Guest';
 
   @override
@@ -548,6 +558,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get priceEgp => 'Price (EGP)';
 
   @override
+  String get editPrice => 'Edit price';
+
+  @override
+  String get savePrice => 'Save price';
+
+  @override
+  String get hostEditPriceHint => 'Tap a price to correct it.';
+
+  @override
   String get notes => 'Notes';
 
   @override
@@ -702,10 +721,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipReceipt => 'Skip receipt';
 
   @override
-  String get skipReceiptHint => 'Everyone pays for their own order.';
+  String get skipReceiptHint =>
+      'Skip the photo. You can still add delivery and fees.';
 
   @override
-  String get payOwnOrderBanner => 'No receipt — everyone pays their own order.';
+  String get skipReceiptFeesHint =>
+      'No receipt photo — add delivery, service, tax, or discount below.';
+
+  @override
+  String get payOwnOrderBanner =>
+      'No receipt photo — split uses orders plus any fees.';
 
   @override
   String get costSharing => 'Cost sharing';

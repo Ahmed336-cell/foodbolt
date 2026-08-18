@@ -90,11 +90,13 @@ class OrderCubit extends Cubit<OrderState> {
     required GetMyOrder getMyOrder,
     required SubmitOrder submitOrder,
     required LockOrders lockOrders,
+    required UpdateOrderItemPrice updateOrderItemPrice,
   })  : _repository = repository,
         _savedOrders = savedOrdersRepository,
         _getMyOrder = getMyOrder,
         _submitOrder = submitOrder,
         _lockOrders = lockOrders,
+        _updateOrderItemPrice = updateOrderItemPrice,
         super(const OrderState());
 
   final OrderRepository _repository;
@@ -102,6 +104,7 @@ class OrderCubit extends Cubit<OrderState> {
   final GetMyOrder _getMyOrder;
   final SubmitOrder _submitOrder;
   final LockOrders _lockOrders;
+  final UpdateOrderItemPrice _updateOrderItemPrice;
   final _uuid = const Uuid();
   StreamSubscription<List<UserOrder>>? _sub;
   String? _roomId;
@@ -270,6 +273,23 @@ class OrderCubit extends Cubit<OrderState> {
     if (roomId == null) return false;
     emit(state.copyWith(loading: true, clearError: true));
     final result = await _lockOrders(roomId);
+    return result.fold(
+      (f) {
+        emit(state.copyWith(loading: false, error: f.message));
+        return false;
+      },
+      (_) {
+        emit(state.copyWith(loading: false));
+        return true;
+      },
+    );
+  }
+
+  Future<bool> updateItemPrice(String itemId, double price) async {
+    emit(state.copyWith(loading: true, clearError: true));
+    final result = await _updateOrderItemPrice(
+      UpdateItemPriceParams(itemId: itemId, price: price),
+    );
     return result.fold(
       (f) {
         emit(state.copyWith(loading: false, error: f.message));

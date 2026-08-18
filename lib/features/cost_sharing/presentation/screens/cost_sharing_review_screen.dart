@@ -47,6 +47,21 @@ class CostSharingReviewScreen extends StatelessWidget {
                 },
               ),
               if (state.error != null) ErrorBanner(message: state.error!),
+              if (context.watch<ReceiptCubit>().state.wasSkipped) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE8D6),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    l10n.skipReceiptFeesHint,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
               if (draft != null) ...[
                 _row(l10n.expectedOrders, draft.expectedOrdersTotal),
                 _row(l10n.receiptTotal, draft.receiptTotal),

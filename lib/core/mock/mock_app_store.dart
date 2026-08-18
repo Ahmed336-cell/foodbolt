@@ -55,14 +55,7 @@ class MockAppStore {
   final _costControllers = <String, StreamController<CostShareDraft>>{};
   final _paymentControllers = <String, StreamController<List<PaymentRecord>>>{};
 
-  static const avatarColors = [
-    0xFFE85D04,
-    0xFF2A9D8F,
-    0xFFE76F51,
-    0xFF264653,
-    0xFFF4A261,
-    0xFF9B5DE5,
-  ];
+  String newId() => _uuid.v4();
 
   void _seedDemoUsers() {
     // Empty — users created on login/guest.
@@ -254,7 +247,6 @@ class MockAppStore {
     yield* _ctrl(_paymentControllers, roomId).stream;
   }
 
-  String newId() => _uuid.v4();
 
   List<Room> historyForUser(String userId) {
     final joined = rooms.values.where((r) {
@@ -272,20 +264,33 @@ class MockAppStore {
     required AdditionalCosts extras,
     Map<String, double>? adjustments,
   }) {
-    final orderList = (orders[roomId] ?? []).where((o) => o.submitted).toList();
-    return CostShareDraft.fromOrders(
-      roomId: roomId,
-      receiptTotal: receiptTotal,
-      additionalCosts: extras,
-      adjustments: adjustments,
-      orders: [
-        for (final o in orderList)
+    final mems = members[roomId] ?? [];
+    final submitted = {
+      for (final o in (orders[roomId] ?? []).where((o) => o.submitted))
+        o.userId: o,
+    };
+    final people = <({String userId, String displayName, double subtotal})>[
+      if (mems.isNotEmpty)
+        for (final m in mems)
+          (
+            userId: m.userId,
+            displayName: m.displayName,
+            subtotal: submitted[m.userId]?.subtotal ?? 0,
+          )
+      else
+        for (final o in submitted.values)
           (
             userId: o.userId,
             displayName: o.displayName,
             subtotal: o.subtotal,
           ),
-      ],
+    ];
+    return CostShareDraft.fromOrders(
+      roomId: roomId,
+      receiptTotal: receiptTotal,
+      additionalCosts: extras,
+      adjustments: adjustments,
+      orders: people,
     );
   }
 }

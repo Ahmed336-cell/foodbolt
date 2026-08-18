@@ -78,9 +78,10 @@ class CostShareDraft extends Equatable {
 
   double get difference => receiptTotal - expectedOrdersTotal;
   double get sharesTotal => shares.fold(0, (s, p) => s + p.finalAmount);
+  double get payableTotal => receiptTotal + additionalCosts.netExtras;
 
-  /// Empty orders pay 0. Receipt gap split only among people who ordered,
-  /// proportional to their subtotal.
+  /// Each person pays their own order. Extra fees + receipt gap split
+  /// equally across everyone (20 with 2 people → 10 each).
   factory CostShareDraft.fromOrders({
     required String roomId,
     required double receiptTotal,
@@ -91,19 +92,15 @@ class CostShareDraft extends Equatable {
     bool confirmed = false,
   }) {
     final expected = orders.fold<double>(0, (s, o) => s + o.subtotal);
-    final pool = receiptTotal;
+    final n = orders.isEmpty ? 1 : orders.length;
+    final extrasPool = additionalCosts.netExtras + (receiptTotal - expected);
+    final extrasEach = extrasPool / n;
     final shares = <ParticipantShare>[];
 
     for (final o in orders) {
       final adj = adjustments?[o.userId] ?? 0;
-      late final double pay;
-      if (expected > 0) {
-        pay = o.subtotal <= 0 ? adj : pool * (o.subtotal / expected) + adj;
-      } else {
-        final n = orders.isEmpty ? 1 : orders.length;
-        pay = pool / n + adj;
-      }
-      final extrasShare = pay - adj - o.subtotal;
+      final extrasShare = extrasEach;
+      final pay = o.subtotal + extrasShare + adj;
       shares.add(
         ParticipantShare(
           userId: o.userId,
@@ -117,19 +114,20 @@ class CostShareDraft extends Equatable {
     }
 
     if (shares.isNotEmpty) {
-      final target = pool;
+      final target = receiptTotal + additionalCosts.netExtras;
       final sum = shares.fold<double>(0, (s, p) => s + p.finalAmount);
       final delta = double.parse((target - sum).toStringAsFixed(2));
       if (delta != 0) {
-        var idx = shares.lastIndexWhere((s) => s.orderSubtotal > 0);
-        if (idx < 0) idx = shares.length - 1;
+        final idx = shares.length - 1;
         final last = shares[idx];
         shares[idx] = ParticipantShare(
           userId: last.userId,
           displayName: last.displayName,
           orderSubtotal: last.orderSubtotal,
-          extrasShare: last.extrasShare,
-          adjustment: last.adjustment + delta,
+          extrasShare: double.parse(
+            (last.extrasShare + delta).toStringAsFixed(2),
+          ),
+          adjustment: last.adjustment,
           finalAmount:
               double.parse((last.finalAmount + delta).toStringAsFixed(2)),
         );

@@ -75,7 +75,7 @@ class RestaurantSelectedScreen extends StatelessWidget {
                             .map(
                               (m) => AvatarCircle(
                                 name: m.displayName,
-                                color: m.avatarColor,
+                                avatar: m.avatar,
                                 size: 38,
                               ),
                             )

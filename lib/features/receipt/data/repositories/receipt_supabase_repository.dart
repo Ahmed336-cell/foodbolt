@@ -127,55 +127,12 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
         'storage_path': null,
       });
 
-      // Each person pays own subtotal — no extras / receipt delta.
-      final shares = orders
-          .map(
-            (o) => {
-              'room_id': roomId,
-              'user_id': o.userId,
-              'order_subtotal': o.subtotal,
-              'extras_share': 0,
-              'adjustment': 0,
-              'final_amount': o.subtotal,
-            },
-          )
-          .toList();
-
-      await _client.from('cost_shares').upsert({
-        'room_id': roomId,
-        'receipt_total': ordersTotal,
-        'expected_orders_total': ordersTotal,
-        'delivery_fee': 0,
-        'service_fee': 0,
-        'tax': 0,
-        'discount': 0,
-        'other_fee': 0,
-        'confirmed': true,
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
-      });
-
-      await _client
-          .from('participant_shares')
-          .delete()
-          .eq('room_id', roomId);
-      await _client.from('participant_shares').insert(shares);
-
-      await _client.from('payments').upsert(
-        [
-          for (final o in orders)
-            {
-              'room_id': roomId,
-              'user_id': o.userId,
-              'amount': o.subtotal,
-              'paid': false,
-              'payment_requested': false,
-            },
-        ],
-        onConflict: 'room_id,user_id',
-      );
+      try {
+        await _seedCostDraft(roomId: roomId, receiptTotal: ordersTotal);
+      } catch (_) {}
 
       await _client.from('rooms').update({
-        'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.paymentSummary),
+        'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.costReview),
       }).eq('id', roomId);
 
       return Success(

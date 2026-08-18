@@ -14,8 +14,12 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String displayName,
+    required String avatar,
   });
-  Future<Result<AppUser>> continueAsGuest({required String displayName});
+  Future<Result<AppUser>> continueAsGuest({
+    required String displayName,
+    required String avatar,
+  });
   Future<Result<void>> logout();
   Future<Result<void>> deleteAccount();
 }
