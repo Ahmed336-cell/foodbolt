@@ -875,6 +875,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notSignedIn => 'Not signed in';
 
   @override
+  String get guideWelcomeTitle => 'Welcome to FoodRush!';
+
+  @override
+  String get guideWelcomeBody =>
+      'This quick guide will show you how the app works. Tap Next to continue.';
+
+  @override
+  String get guideCreateRoomTitle => 'Create a Room';
+
+  @override
+  String get guideCreateRoomBody =>
+      'Start a new room and invite your friends. Everyone joins with a simple code.';
+
+  @override
+  String get guideJoinRoomTitle => 'Join a Room';
+
+  @override
+  String get guideJoinRoomBody =>
+      'Got a code from a friend? Enter it here to join their room instantly.';
+
+  @override
+  String get guideHistoryTitle => 'Order History';
+
+  @override
+  String get guideHistoryBody =>
+      'View your past rooms — who ordered what, the receipt, and each person\'s share.';
+
+  @override
+  String get guideProfileTitle => 'Your Profile';
+
+  @override
+  String get guideProfileBody =>
+      'Change your language, manage your account, or log out from here.';
+
+  @override
+  String get guideSuggestTitle => 'Suggest Restaurants';
+
+  @override
+  String get guideSuggestBody =>
+      'Each member can suggest places to eat. The group decides together.';
+
+  @override
+  String get guideVoteRaceTitle => 'Vote or Race';
+
+  @override
+  String get guideVoteRaceBody =>
+      'Vote on restaurants. If it\'s a tie, the tied restaurants race for it!';
+
+  @override
+  String get guideOrderTitle => 'Place Your Order';
+
+  @override
+  String get guideOrderBody =>
+      'Everyone adds their own items. The host locks orders when ready.';
+
+  @override
+  String get guideReceiptTitle => 'Upload the Receipt';
+
+  @override
+  String get guideReceiptBody =>
+      'Take a photo of the receipt. Or skip it — you can still split the bill.';
+
+  @override
+  String get guideSplitTitle => 'Split the Bill';
+
+  @override
+  String get guideSplitBody =>
+      'Delivery, tax, and fees are divided equally. Everyone sees exactly what they owe.';
+
+  @override
   String get errAuthFailed => 'Authentication failed.';
 
   @override

@@ -78,7 +78,9 @@ class CostShareDraft extends Equatable {
 
   double get difference => receiptTotal - expectedOrdersTotal;
   double get sharesTotal => shares.fold(0, (s, p) => s + p.finalAmount);
-  double get payableTotal => receiptTotal + additionalCosts.netExtras;
+  double get payableTotal =>
+      (receiptTotal > 0 ? receiptTotal : expectedOrdersTotal) +
+      additionalCosts.netExtras;
 
   /// Each person pays their own order. Extra fees + receipt gap split
   /// equally across everyone (20 with 2 people → 10 each).
@@ -93,7 +95,8 @@ class CostShareDraft extends Equatable {
   }) {
     final expected = orders.fold<double>(0, (s, o) => s + o.subtotal);
     final n = orders.isEmpty ? 1 : orders.length;
-    final extrasPool = additionalCosts.netExtras + (receiptTotal - expected);
+    final receiptGap = receiptTotal > 0 ? receiptTotal - expected : 0.0;
+    final extrasPool = additionalCosts.netExtras + receiptGap;
     final extrasEach = extrasPool / n;
     final shares = <ParticipantShare>[];
 
@@ -114,7 +117,8 @@ class CostShareDraft extends Equatable {
     }
 
     if (shares.isNotEmpty) {
-      final target = receiptTotal + additionalCosts.netExtras;
+      final base = receiptTotal > 0 ? receiptTotal : expected;
+      final target = base + additionalCosts.netExtras;
       final sum = shares.fold<double>(0, (s, p) => s + p.finalAmount);
       final delta = double.parse((target - sum).toStringAsFixed(2));
       if (delta != 0) {

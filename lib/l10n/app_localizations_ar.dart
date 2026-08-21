@@ -872,6 +872,74 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notSignedIn => 'لم تسجل الدخول';
 
   @override
+  String get guideWelcomeTitle => 'مرحبًا في FoodRush!';
+
+  @override
+  String get guideWelcomeBody =>
+      'هذا الدليل السريع يوضح لك كيف يعمل التطبيق. اضغط التالي للمتابعة.';
+
+  @override
+  String get guideCreateRoomTitle => 'إنشاء غرفة';
+
+  @override
+  String get guideCreateRoomBody =>
+      'أنشئ غرفة جديدة وادعُ أصدقاءك. الجميع ينضم بكود بسيط.';
+
+  @override
+  String get guideJoinRoomTitle => 'انضم لغرفة';
+
+  @override
+  String get guideJoinRoomBody => 'عندك كود من صديق؟ أدخله هنا للانضمام فورًا.';
+
+  @override
+  String get guideHistoryTitle => 'سجل الطلبات';
+
+  @override
+  String get guideHistoryBody =>
+      'شاهد غرفك السابقة — مين طلب إيه، الفاتورة، ونصيب كل واحد.';
+
+  @override
+  String get guideProfileTitle => 'ملفك الشخصي';
+
+  @override
+  String get guideProfileBody => 'غيّر اللغة، أدِر حسابك، أو سجّل خروج من هنا.';
+
+  @override
+  String get guideSuggestTitle => 'اقتراح مطاعم';
+
+  @override
+  String get guideSuggestBody =>
+      'كل عضو يقدر يقترح أماكن للأكل. المجموعة تقرر سوا.';
+
+  @override
+  String get guideVoteRaceTitle => 'تصويت أو سباق';
+
+  @override
+  String get guideVoteRaceBody =>
+      'صوّت على المطاعم. لو في تعادل، المطاعم المتعادلة تتسابق!';
+
+  @override
+  String get guideOrderTitle => 'اطلب أكلك';
+
+  @override
+  String get guideOrderBody =>
+      'كل واحد يضيف طلبه. المضيف يقفل الطلبات لما الكل يخلص.';
+
+  @override
+  String get guideReceiptTitle => 'ارفع الفاتورة';
+
+  @override
+  String get guideReceiptBody =>
+      'صوّر الفاتورة. أو تخطاها — تقدر تقسم الحساب برضو.';
+
+  @override
+  String get guideSplitTitle => 'قسّم الحساب';
+
+  @override
+  String get guideSplitBody =>
+      'التوصيل والضريبة والرسوم تتقسم بالتساوي. كل واحد يشوف نصيبه بالظبط.';
+
+  @override
   String get errAuthFailed => 'فشل التحقق من الهوية.';
 
   @override

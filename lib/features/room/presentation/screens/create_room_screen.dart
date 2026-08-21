@@ -130,11 +130,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                         ),
                       );
                     }),
-                    SwitchListTile(
-                      value: _guestAccess,
-                      onChanged: (v) => setState(() => _guestAccess = v),
-                      title: Text(l10n.allowGuests),
-                    ),
+
                     const SizedBox(height: 24),
                     PrimaryButton(
                       label: l10n.createRoom,

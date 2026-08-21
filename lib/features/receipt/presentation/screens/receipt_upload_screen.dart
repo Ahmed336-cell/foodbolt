@@ -6,7 +6,8 @@ import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
-import '../../../../core/widgets/numeric_input.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../room/presentation/cubit/room_cubit.dart';
 import '../cubit/receipt_cubit.dart';
 import '../widgets/receipt_photo.dart';
 
@@ -24,10 +25,46 @@ class ReceiptUploadScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final userId = context.watch<AuthCubit>().state.user?.id;
+    final isHost = context.watch<RoomCubit>().state.isHost(userId);
+
     return Scaffold(
       appBar: AppBar(title: Text(l10n.uploadReceiptTitle)),
       body: BlocBuilder<ReceiptCubit, ReceiptState>(
         builder: (context, state) {
+          if (!isHost) {
+            return AdaptivePadding(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Spacer(),
+                  const Center(
+                    child: Text('🧾', style: TextStyle(fontSize: 52)),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      l10n.waitingHostReceipt,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (state.receipt != null)
+                    ReceiptPhoto(
+                      imageUrl: state.receipt?.imageUrl,
+                      height: 220,
+                    ),
+                  const Spacer(),
+                ],
+              ),
+            );
+          }
+
           return AdaptivePadding(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -61,13 +98,6 @@ class ReceiptUploadScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  keyboardType: NumericInput.decimalKeyboard,
-                  inputFormatters: NumericInput.decimal,
-                  decoration: InputDecoration(hintText: l10n.receiptTotalHint),
-                  onChanged: context.read<ReceiptCubit>().setTotal,
                 ),
                 const SizedBox(height: 12),
                 Row(

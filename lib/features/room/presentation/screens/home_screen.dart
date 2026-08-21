@@ -9,7 +9,9 @@ import '../../../../core/responsive/breakpoints.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
+import '../../../../core/widgets/coach_marks.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../../../settings/presentation/widgets/language_switch.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -60,7 +62,11 @@ class _HomeScreenState extends State<HomeScreen>
       desktop: 64.0,
     );
 
-    return Scaffold(
+    final showGuide = !context.watch<SettingsCubit>().state.guideSeen;
+
+    return Stack(
+      children: [
+        Scaffold(
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -290,6 +296,65 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ),
       ),
+    ),
+        if (showGuide)
+          CoachMarksOverlay(
+            steps: [
+              CoachStep(
+                icon: Icons.celebration_rounded,
+                title: l10n.guideWelcomeTitle,
+                body: l10n.guideWelcomeBody,
+              ),
+              CoachStep(
+                icon: Icons.bolt_rounded,
+                title: l10n.guideCreateRoomTitle,
+                body: l10n.guideCreateRoomBody,
+              ),
+              CoachStep(
+                icon: Icons.group_add_rounded,
+                title: l10n.guideJoinRoomTitle,
+                body: l10n.guideJoinRoomBody,
+              ),
+              CoachStep(
+                icon: Icons.restaurant_menu_rounded,
+                title: l10n.guideSuggestTitle,
+                body: l10n.guideSuggestBody,
+              ),
+              CoachStep(
+                icon: Icons.how_to_vote_rounded,
+                title: l10n.guideVoteRaceTitle,
+                body: l10n.guideVoteRaceBody,
+              ),
+              CoachStep(
+                icon: Icons.fastfood_rounded,
+                title: l10n.guideOrderTitle,
+                body: l10n.guideOrderBody,
+              ),
+              CoachStep(
+                icon: Icons.receipt_long_rounded,
+                title: l10n.guideReceiptTitle,
+                body: l10n.guideReceiptBody,
+              ),
+              CoachStep(
+                icon: Icons.pie_chart_rounded,
+                title: l10n.guideSplitTitle,
+                body: l10n.guideSplitBody,
+              ),
+              if (user?.isGuest != true)
+                CoachStep(
+                  icon: Icons.history_rounded,
+                  title: l10n.guideHistoryTitle,
+                  body: l10n.guideHistoryBody,
+                ),
+              CoachStep(
+                icon: Icons.person_outline_rounded,
+                title: l10n.guideProfileTitle,
+                body: l10n.guideProfileBody,
+              ),
+            ],
+            onFinish: () => context.read<SettingsCubit>().finishGuide(),
+          ),
+      ],
     );
   }
 }

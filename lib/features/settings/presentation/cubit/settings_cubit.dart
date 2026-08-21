@@ -18,6 +18,7 @@ class SettingsState extends Equatable {
       settings.localeCode == null ? null : Locale(settings.localeCode!);
 
   bool get onboardingSeen => settings.onboardingSeen;
+  bool get guideSeen => settings.guideSeen;
 
   SettingsState copyWith({AppSettings? settings, bool? loaded}) => SettingsState(
         settings: settings ?? this.settings,
@@ -34,16 +35,19 @@ class SettingsCubit extends Cubit<SettingsState> {
     required SaveLocale saveLocale,
     required CompleteOnboarding completeOnboarding,
     required ResetOnboarding resetOnboarding,
+    required CompleteGuide completeGuide,
   })  : _loadSettings = loadSettings,
         _saveLocale = saveLocale,
         _completeOnboarding = completeOnboarding,
         _resetOnboarding = resetOnboarding,
+        _completeGuide = completeGuide,
         super(const SettingsState());
 
   final LoadSettings _loadSettings;
   final SaveLocale _saveLocale;
   final CompleteOnboarding _completeOnboarding;
   final ResetOnboarding _resetOnboarding;
+  final CompleteGuide _completeGuide;
 
   Future<void> load() async {
     final settings = await _loadSettings();
@@ -74,6 +78,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (_) {
       // Still leave onboarding marked done in memory so navigation proceeds.
     }
+  }
+
+  Future<void> finishGuide() async {
+    if (state.settings.guideSeen) return;
+    emit(state.copyWith(settings: state.settings.copyWith(guideSeen: true)));
+    try {
+      await _completeGuide();
+    } catch (_) {}
   }
 
   Future<void> resetOnboarding() async {

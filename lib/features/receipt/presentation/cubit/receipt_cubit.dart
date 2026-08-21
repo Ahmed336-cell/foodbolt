@@ -92,11 +92,9 @@ class ReceiptCubit extends Cubit<ReceiptState> {
       emit(state.copyWith(error: 'Select a receipt image first.'));
       return false;
     }
-    final total = double.tryParse(state.totalText.replaceAll(',', ''));
-    if (total == null) {
-      emit(state.copyWith(error: 'Enter a valid receipt total.'));
-      return false;
-    }
+    final total = state.totalText.isEmpty
+        ? null
+        : double.tryParse(state.totalText.replaceAll(',', ''));
     emit(state.copyWith(loading: true, clearError: true));
     final result = await _uploadReceipt(
       UploadReceiptParams(roomId: roomId, localPath: path, totalAmount: total),

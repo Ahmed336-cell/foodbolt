@@ -19,11 +19,11 @@ class UploadReceiptParams {
   const UploadReceiptParams({
     required this.roomId,
     required this.localPath,
-    required this.totalAmount,
+    this.totalAmount,
   });
   final String roomId;
   final String localPath;
-  final double totalAmount;
+  final double? totalAmount;
 }
 
 class SkipReceipt extends UseCase<Receipt, String> {

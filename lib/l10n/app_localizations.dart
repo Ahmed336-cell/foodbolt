@@ -1712,6 +1712,126 @@ abstract class AppLocalizations {
   /// **'Not signed in'**
   String get notSignedIn;
 
+  /// No description provided for @guideWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to FoodRush!'**
+  String get guideWelcomeTitle;
+
+  /// No description provided for @guideWelcomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This quick guide will show you how the app works. Tap Next to continue.'**
+  String get guideWelcomeBody;
+
+  /// No description provided for @guideCreateRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a Room'**
+  String get guideCreateRoomTitle;
+
+  /// No description provided for @guideCreateRoomBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new room and invite your friends. Everyone joins with a simple code.'**
+  String get guideCreateRoomBody;
+
+  /// No description provided for @guideJoinRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a Room'**
+  String get guideJoinRoomTitle;
+
+  /// No description provided for @guideJoinRoomBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Got a code from a friend? Enter it here to join their room instantly.'**
+  String get guideJoinRoomBody;
+
+  /// No description provided for @guideHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order History'**
+  String get guideHistoryTitle;
+
+  /// No description provided for @guideHistoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'View your past rooms — who ordered what, the receipt, and each person\'s share.'**
+  String get guideHistoryBody;
+
+  /// No description provided for @guideProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Profile'**
+  String get guideProfileTitle;
+
+  /// No description provided for @guideProfileBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Change your language, manage your account, or log out from here.'**
+  String get guideProfileBody;
+
+  /// No description provided for @guideSuggestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest Restaurants'**
+  String get guideSuggestTitle;
+
+  /// No description provided for @guideSuggestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Each member can suggest places to eat. The group decides together.'**
+  String get guideSuggestBody;
+
+  /// No description provided for @guideVoteRaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote or Race'**
+  String get guideVoteRaceTitle;
+
+  /// No description provided for @guideVoteRaceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote on restaurants. If it\'s a tie, the tied restaurants race for it!'**
+  String get guideVoteRaceBody;
+
+  /// No description provided for @guideOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Place Your Order'**
+  String get guideOrderTitle;
+
+  /// No description provided for @guideOrderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone adds their own items. The host locks orders when ready.'**
+  String get guideOrderBody;
+
+  /// No description provided for @guideReceiptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload the Receipt'**
+  String get guideReceiptTitle;
+
+  /// No description provided for @guideReceiptBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of the receipt. Or skip it — you can still split the bill.'**
+  String get guideReceiptBody;
+
+  /// No description provided for @guideSplitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Split the Bill'**
+  String get guideSplitTitle;
+
+  /// No description provided for @guideSplitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery, tax, and fees are divided equally. Everyone sees exactly what they owe.'**
+  String get guideSplitBody;
+
   /// No description provided for @errAuthFailed.
   ///
   /// In en, this message translates to:

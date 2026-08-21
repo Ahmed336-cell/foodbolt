@@ -5,7 +5,7 @@ abstract class ReceiptRepository {
   Future<Result<Receipt>> uploadReceipt({
     required String roomId,
     required String localPath,
-    required double totalAmount,
+    double? totalAmount,
   });
 
   /// Skip receipt upload — each participant pays their own order total.

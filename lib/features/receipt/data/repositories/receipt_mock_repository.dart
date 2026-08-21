@@ -14,16 +14,13 @@ class ReceiptMockRepository implements ReceiptRepository {
   Future<Result<Receipt>> uploadReceipt({
     required String roomId,
     required String localPath,
-    required double totalAmount,
+    double? totalAmount,
   }) async {
     final userResult = _store.requireUser();
     if (userResult case Failed(:final failure)) return Failed(failure);
     final memberResult =
         _store.requireMember(roomId, userResult.dataOrNull!.id);
     if (memberResult case Failed(:final failure)) return Failed(failure);
-    if (totalAmount <= 0) {
-      return const Failed(ValidationFailure('Enter receipt total.'));
-    }
     await Future<void>.delayed(const Duration(milliseconds: 600));
     final receipt = Receipt(
       roomId: roomId,
@@ -41,7 +38,7 @@ class ReceiptMockRepository implements ReceiptRepository {
       _store.emitCost(
         _store.recalculateCost(
           roomId: roomId,
-          receiptTotal: totalAmount,
+          receiptTotal: totalAmount ?? 0,
           extras: const AdditionalCosts(),
         ),
       );

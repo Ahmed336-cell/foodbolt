@@ -4,4 +4,5 @@ abstract class SettingsRepository {
   Future<AppSettings> load();
   Future<void> saveLocale(String? localeCode);
   Future<void> setOnboardingSeen(bool seen);
+  Future<void> setGuideSeen(bool seen);
 }

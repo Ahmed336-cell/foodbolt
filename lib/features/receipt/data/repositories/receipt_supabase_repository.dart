@@ -22,14 +22,10 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
   Future<Result<Receipt>> uploadReceipt({
     required String roomId,
     required String localPath,
-    required double totalAmount,
+    double? totalAmount,
   }) async {
     final userId = SupabaseMappers.requireUserId(_client);
     if (userId == null) return const Failed(AuthFailure());
-
-    if (totalAmount <= 0) {
-      return const Failed(ValidationFailure('Enter receipt total.'));
-    }
 
     try {
       final member = await _client
@@ -50,22 +46,34 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
             ),
           );
 
-      try {
-        await _client.rpc(
-          'save_uploaded_receipt',
-          params: {
-            'p_room_id': roomId,
-            'p_storage_path': storagePath,
-            'p_total': totalAmount,
-            'p_status': 'uploaded',
-          },
-        );
-      } catch (e) {
-        if (!_isMissingSaveReceiptRpc(e)) rethrow;
+      if (totalAmount != null && totalAmount > 0) {
+        try {
+          await _client.rpc(
+            'save_uploaded_receipt',
+            params: {
+              'p_room_id': roomId,
+              'p_storage_path': storagePath,
+              'p_total': totalAmount,
+              'p_status': 'uploaded',
+            },
+          );
+        } catch (e) {
+          if (!_isMissingSaveReceiptRpc(e)) rethrow;
+          await _client.from('receipts').upsert({
+            'room_id': roomId,
+            'storage_path': storagePath,
+            'total_amount': totalAmount,
+            'uploaded_by': userId,
+            'status': SupabaseMappers.receiptStatusToDb(ReceiptStatus.uploaded),
+          });
+          await _client.from('rooms').update({
+            'phase': SupabaseMappers.roomPhaseToDb(RoomPhase.costReview),
+          }).eq('id', roomId);
+        }
+      } else {
         await _client.from('receipts').upsert({
           'room_id': roomId,
           'storage_path': storagePath,
-          'total_amount': totalAmount,
           'uploaded_by': userId,
           'status': SupabaseMappers.receiptStatusToDb(ReceiptStatus.uploaded),
         });
@@ -76,7 +84,10 @@ class ReceiptSupabaseRepository implements ReceiptRepository {
 
       // Best-effort seed of cost draft (host RLS may block non-host writers).
       try {
-        await _seedCostDraft(roomId: roomId, receiptTotal: totalAmount);
+        await _seedCostDraft(
+          roomId: roomId,
+          receiptTotal: totalAmount ?? 0,
+        );
       } catch (_) {}
 
       return Success(

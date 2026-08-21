@@ -9,6 +9,7 @@ import '../../domain/repositories/settings_repository.dart';
 class SettingsPrefsRepository implements SettingsRepository {
   static const _localeKey = 'settings.locale';
   static const _onboardingKey = 'settings.onboarding_seen';
+  static const _guideKey = 'settings.guide_seen';
 
   SharedPreferences? _prefs;
   bool _prefsBroken = false;
@@ -35,9 +36,11 @@ class SettingsPrefsRepository implements SettingsRepository {
       try {
         final locale = prefs.getString(_localeKey);
         final seen = prefs.getBool(_onboardingKey) ?? false;
+        final guide = prefs.getBool(_guideKey) ?? false;
         if (locale != null) _memory[_localeKey] = locale;
         _memory[_onboardingKey] = seen;
-        return AppSettings(localeCode: locale, onboardingSeen: seen);
+        _memory[_guideKey] = guide;
+        return AppSettings(localeCode: locale, onboardingSeen: seen, guideSeen: guide);
       } catch (e) {
         _prefsBroken = true;
         debugPrint('SharedPreferences load failed: $e');
@@ -46,6 +49,7 @@ class SettingsPrefsRepository implements SettingsRepository {
     return AppSettings(
       localeCode: _memory[_localeKey] as String?,
       onboardingSeen: (_memory[_onboardingKey] as bool?) ?? false,
+      guideSeen: (_memory[_guideKey] as bool?) ?? false,
     );
   }
 
@@ -82,6 +86,20 @@ class SettingsPrefsRepository implements SettingsRepository {
     } catch (e) {
       _prefsBroken = true;
       debugPrint('SharedPreferences setOnboardingSeen failed: $e');
+    }
+  }
+
+  @override
+  Future<void> setGuideSeen(bool seen) async {
+    _memory[_guideKey] = seen;
+
+    final prefs = await _tryPrefs();
+    if (prefs == null) return;
+    try {
+      await prefs.setBool(_guideKey, seen);
+    } catch (e) {
+      _prefsBroken = true;
+      debugPrint('SharedPreferences setGuideSeen failed: $e');
     }
   }
 }

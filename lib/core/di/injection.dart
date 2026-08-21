@@ -230,12 +230,14 @@ void _registerUseCasesAndCubits() {
   sl.registerLazySingleton(() => SaveLocale(sl()));
   sl.registerLazySingleton(() => CompleteOnboarding(sl()));
   sl.registerLazySingleton(() => ResetOnboarding(sl()));
+  sl.registerLazySingleton(() => CompleteGuide(sl()));
   sl.registerLazySingleton(
     () => SettingsCubit(
       loadSettings: sl(),
       saveLocale: sl(),
       completeOnboarding: sl(),
       resetOnboarding: sl(),
+      completeGuide: sl(),
     ),
   );
 
