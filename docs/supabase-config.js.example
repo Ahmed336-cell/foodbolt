@@ -1,0 +1,6 @@
+// Copy to supabase-config.js and fill with your project values.
+// The anon key is safe to expose in browsers (RLS still protects data).
+window.FOODRUSH_SUPABASE = {
+  url: 'https://YOUR_PROJECT.supabase.co',
+  anonKey: 'YOUR_SUPABASE_ANON_KEY',
+};

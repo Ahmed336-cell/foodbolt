@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delete FoodRush account</title>
+  <meta name="description" content="Delete your FoodRush account and associated data.">
+  <style>
+    :root {
+      --orange: #e85d04;
+      --orange-soft: #f48c06;
+      --cream: #fff8f0;
+      --navy: #141830;
+      --muted: #6b6b6b;
+      --danger: #c1121f;
+      --ok: #2d6a4f;
+      --border: #ead9c8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(160deg, #ffe8d6 0%, var(--cream) 45%, #fff 100%);
+      color: var(--navy);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+    .wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .brand .mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #111;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(232, 93, 4, 0.08);
+    }
+    h2 { margin: 0 0 8px; font-size: 1.25rem; }
+    .lead { color: var(--muted); margin: 0 0 20px; }
+    ol { padding-left: 1.2rem; margin: 0 0 20px; color: var(--muted); }
+    ol li { margin-bottom: 6px; }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 14px 0 6px;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: var(--cream);
+    }
+    input:focus {
+      outline: 2px solid rgba(232, 93, 4, 0.35);
+      border-color: var(--orange);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--orange-soft); }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .msg {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      display: none;
+    }
+    .msg.show { display: block; }
+    .msg.error { background: #fde8e8; color: #7a1212; }
+    .msg.ok { background: #e7f5ef; color: var(--ok); }
+    .msg.info { background: #fff3e6; color: #7a3e00; }
+    .check {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 16px;
+      font-size: 0.92rem;
+    }
+    .check input { margin-top: 3px; }
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+    .session {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .session strong { color: var(--navy); }
+    footer {
+      margin-top: 28px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--orange); }
+    .ar {
+      direction: rtl;
+      border-top: 1px solid var(--border);
+      margin-top: 36px;
+      padding-top: 28px;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">FR</div>
+      <div>
+        <h1>FoodRush</h1>
+        <p>Delete your account</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Delete account</h2>
+      <p class="lead">
+        This permanently removes your FoodRush profile and signs you out.
+        Room history tied only to your account is cleaned up where possible.
+      </p>
+
+      <ol>
+        <li><strong>In the app:</strong> Profile → Delete account (fastest).</li>
+        <li><strong>On this page:</strong> sign in with the same email &amp; password, then confirm.</li>
+      </ol>
+
+      <div id="signedOut">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" placeholder="you@email.com">
+
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+
+        <div class="row">
+          <button type="button" class="btn-primary" id="btnSignIn">Sign in</button>
+        </div>
+      </div>
+
+      <div id="signedIn" class="hidden">
+        <p class="session">Signed in as <strong id="userEmail"></strong></p>
+        <label class="check">
+          <input type="checkbox" id="confirmCheck">
+          <span>I understand this cannot be undone. Delete my FoodRush account and profile data.</span>
+        </label>
+        <div class="row">
+          <button type="button" class="btn-danger" id="btnDelete" disabled>Delete my account</button>
+          <button type="button" class="btn-ghost" id="btnSignOut">Sign out</button>
+        </div>
+      </div>
+
+      <div id="msg" class="msg" role="status"></div>
+
+      <div class="divider"></div>
+      <p class="lead" style="margin:0">
+        Guest accounts are temporary and are not kept after a room ends — nothing to delete.
+      </p>
+    </div>
+
+    <footer>
+      <a href="privacy.html">Privacy Policy</a>
+      ·
+      <a href="index.html">Home</a>
+    </footer>
+
+    <section class="ar" lang="ar">
+      <h2>حذف الحساب</h2>
+      <p>
+        احذف حسابك من التطبيق: الملف الشخصي → حذف الحساب.
+        أو سجّل الدخول هنا بنفس البريد وكلمة المرور ثم أكّد الحذف.
+      </p>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    (function () {
+      const cfg = window.FOODRUSH_SUPABASE;
+      const msgEl = document.getElementById('msg');
+      const signedOut = document.getElementById('signedOut');
+      const signedIn = document.getElementById('signedIn');
+      const userEmail = document.getElementById('userEmail');
+      const confirmCheck = document.getElementById('confirmCheck');
+      const btnDelete = document.getElementById('btnDelete');
+
+      function show(type, text) {
+        msgEl.className = 'msg show ' + type;
+        msgEl.textContent = text;
+      }
+
+      function clearMsg() {
+        msgEl.className = 'msg';
+        msgEl.textContent = '';
+      }
+
+      if (!cfg || !cfg.url || !cfg.anonKey) {
+        show('error', 'Delete page is not configured yet (missing supabase-config.js).');
+        return;
+      }
+
+      const client = window.supabase.createClient(cfg.url, cfg.anonKey);
+
+      async function refreshSession() {
+        const { data: { session } } = await client.auth.getSession();
+        if (session && session.user) {
+          signedOut.classList.add('hidden');
+          signedIn.classList.remove('hidden');
+          userEmail.textContent = session.user.email || session.user.id;
+          confirmCheck.checked = false;
+          btnDelete.disabled = true;
+        } else {
+          signedIn.classList.add('hidden');
+          signedOut.classList.remove('hidden');
+        }
+      }
+
+      confirmCheck.addEventListener('change', () => {
+        btnDelete.disabled = !confirmCheck.checked;
+      });
+
+      document.getElementById('btnSignIn').addEventListener('click', async () => {
+        clearMsg();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        if (!email || !password) {
+          show('error', 'Enter email and password.');
+          return;
+        }
+        show('info', 'Signing in…');
+        const { error } = await client.auth.signInWithPassword({ email, password });
+        if (error) {
+          show('error', error.message || 'Sign in failed.');
+          return;
+        }
+        clearMsg();
+        await refreshSession();
+      });
+
+      document.getElementById('btnSignOut').addEventListener('click', async () => {
+        await client.auth.signOut();
+        clearMsg();
+        await refreshSession();
+      });
+
+      btnDelete.addEventListener('click', async () => {
+        if (!confirmCheck.checked) return;
+        const ok = window.confirm('Delete your FoodRush account permanently?');
+        if (!ok) return;
+        btnDelete.disabled = true;
+        show('info', 'Deleting account…');
+        try {
+          const { error } = await client.rpc('delete_my_account');
+          if (error) throw error;
+          try { await client.auth.signOut(); } catch (_) {}
+          show('ok', 'Account deleted. You can close this page.');
+          signedIn.classList.add('hidden');
+          signedOut.classList.remove('hidden');
+          document.getElementById('email').value = '';
+          document.getElementById('password').value = '';
+        } catch (e) {
+          show('error', (e && e.message) ? e.message : 'Could not delete account. Try again or use Profile in the app.');
+          btnDelete.disabled = !confirmCheck.checked;
+        }
+      });
+
+      refreshSession();
+    })();
+  </script>
+</body>
+</html>
