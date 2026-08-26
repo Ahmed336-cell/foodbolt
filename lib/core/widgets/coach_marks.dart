@@ -128,6 +128,10 @@ class _CoachMarksOverlayState extends State<CoachMarksOverlay>
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFE85D04),
                               foregroundColor: Colors.white,
+                              // Theme uses Size.fromHeight(56) → infinite width.
+                              // That breaks inside a Row; pin a finite min size.
+                              minimumSize: const Size(56, 44),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
                               ),

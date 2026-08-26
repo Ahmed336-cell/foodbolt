@@ -62,7 +62,10 @@ class _HomeScreenState extends State<HomeScreen>
       desktop: 64.0,
     );
 
-    final showGuide = !context.watch<SettingsCubit>().state.guideSeen;
+    // Guide only for signed-in users (not guests).
+    final showGuide = user != null &&
+        user.isGuest != true &&
+        !context.watch<SettingsCubit>().state.guideSeen;
 
     return Stack(
       children: [
