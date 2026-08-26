@@ -1,14 +1,21 @@
-FoodRush is group food ordering made simple.
+FoodRush turns “where should we eat?” into a fun group flow: Room → Decide → Order → Receipt → Split.
 
-Create a room, share one invite link, and let friends join in seconds — even as guests, no account required.
+CREATE A ROOM
+Start a hangout, share one invite link or room code, and friends join in seconds — even as guests, no account needed. Sign up if you want to keep history.
 
-Decide what to eat:
-• Suggest restaurants
+DECIDE TOGETHER
+• Everyone suggests restaurants
 • Vote as a group
-• Tied vote? The restaurants race it out
+• Pick a mode: race all places, vote with a race on ties, or vote only
+• Tied votes? Restaurants race it out — the winner is dinner
 
-Then order together, upload the receipt, and split the bill so everyone sees exactly what they owe.
+ORDER AS A GROUP
+Each person adds their own items. The host locks orders and shares one combined list with the restaurant (WhatsApp, call, or delivery app).
 
-Built for hangouts, office lunches, and last-minute “where are we eating?” chaos.
+SPLIT FAIRLY
+Upload the receipt (or skip the photo), add delivery, tax, service, or discount, and everyone sees exactly what they owe. Mark payments until the room is settled.
 
-Privacy: we collect account email (if you sign up), display name, room/order data, and receipt photos you upload. We do not sell your data. Delete your account anytime from Profile.
+BUILT FOR REAL LIFE
+Office lunches, friend nights, last-minute plans. English & Arabic. Delete your account anytime in Profile or at foodrush.app.
+
+Privacy: we collect account email (if you sign up), display name, room/order data, and receipt photos you upload. We do not sell your data.
