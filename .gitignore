@@ -56,6 +56,9 @@ android/app/*.jks
 android/app/*.keystore
 android/play-store.json
 
+# Local tooling
+.venv-store/
+
 # Fastlane screenshot outputs (regenerate with `fastlane screenshots`)
 /android/fastlane/screenshots/
 /android/fastlane/metadata/android/**/images/phoneScreenshots/
