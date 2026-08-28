@@ -872,6 +872,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notSignedIn => 'لم تسجل الدخول';
 
   @override
+  String get reportConcern => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get reportConcernHint =>
+      'أبلغ عن مشاكل السلامة أو الإساءة أو CSAE لفريق سلامة الأطفال.';
+
+  @override
+  String get reportEmailSubject => 'بلاغ فودراش';
+
+  @override
+  String get reportEmailUnavailable =>
+      'تعذّر فتح البريد. تواصل على ahmaher04@gmail.com';
+
+  @override
   String get guideWelcomeTitle => 'مرحبًا في FoodRush!';
 
   @override

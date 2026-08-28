@@ -6,6 +6,9 @@ class AppConstants {
   static const currency = 'EGP';
   static const defaultVoteLimit = 1;
 
+  /// Child Safety point of contact (Google Play Child Safety Standards).
+  static const childSafetyEmail = 'ahmaher04@gmail.com';
+
   /// Custom URL scheme registered on Android / iOS.
   static const inviteScheme = 'foodrush';
 

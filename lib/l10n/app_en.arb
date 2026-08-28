@@ -317,6 +317,11 @@
   "arabic": "العربية",
   "notSignedIn": "Not signed in",
 
+  "reportConcern": "Report a concern",
+  "reportConcernHint": "Report safety issues, abuse, or CSAE concerns to our Child Safety team.",
+  "reportEmailSubject": "FoodRush report",
+  "reportEmailUnavailable": "Could not open email app. Contact ahmaher04@gmail.com",
+
   "guideWelcomeTitle": "Welcome to FoodRush!",
   "guideWelcomeBody": "This quick guide will show you how the app works. Tap Next to continue.",
   "guideCreateRoomTitle": "Create a Room",

@@ -875,6 +875,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notSignedIn => 'Not signed in';
 
   @override
+  String get reportConcern => 'Report a concern';
+
+  @override
+  String get reportConcernHint =>
+      'Report safety issues, abuse, or CSAE concerns to our Child Safety team.';
+
+  @override
+  String get reportEmailSubject => 'FoodRush report';
+
+  @override
+  String get reportEmailUnavailable =>
+      'Could not open email app. Contact ahmaher04@gmail.com';
+
+  @override
   String get guideWelcomeTitle => 'Welcome to FoodRush!';
 
   @override

@@ -1712,6 +1712,30 @@ abstract class AppLocalizations {
   /// **'Not signed in'**
   String get notSignedIn;
 
+  /// No description provided for @reportConcern.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a concern'**
+  String get reportConcern;
+
+  /// No description provided for @reportConcernHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Report safety issues, abuse, or CSAE concerns to our Child Safety team.'**
+  String get reportConcernHint;
+
+  /// No description provided for @reportEmailSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'FoodRush report'**
+  String get reportEmailSubject;
+
+  /// No description provided for @reportEmailUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open email app. Contact ahmaher04@gmail.com'**
+  String get reportEmailUnavailable;
+
   /// No description provided for @guideWelcomeTitle.
   ///
   /// In en, this message translates to:

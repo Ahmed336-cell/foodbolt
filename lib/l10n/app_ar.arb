@@ -317,6 +317,11 @@
   "arabic": "العربية",
   "notSignedIn": "لم تسجل الدخول",
 
+  "reportConcern": "الإبلاغ عن مشكلة",
+  "reportConcernHint": "أبلغ عن مشاكل السلامة أو الإساءة أو CSAE لفريق سلامة الأطفال.",
+  "reportEmailSubject": "بلاغ فودراش",
+  "reportEmailUnavailable": "تعذّر فتح البريد. تواصل على ahmaher04@gmail.com",
+
   "guideWelcomeTitle": "مرحبًا في FoodRush!",
   "guideWelcomeBody": "هذا الدليل السريع يوضح لك كيف يعمل التطبيق. اضغط التالي للمتابعة.",
   "guideCreateRoomTitle": "إنشاء غرفة",

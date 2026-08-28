@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/localization/failure_messages.dart';
 import '../../../../core/localization/l10n_extension.dart';
+import '../../../../core/support/report_concern.dart';
 import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_widgets.dart';
@@ -69,6 +70,22 @@ class ProfileScreen extends StatelessWidget {
             if (user.isGuest) Center(child: Chip(label: Text(l10n.guest))),
             const SizedBox(height: 28),
             const LanguageSwitch(),
+            const SizedBox(height: 20),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.flag_outlined),
+              title: Text(l10n.reportConcern),
+              subtitle: Text(l10n.reportConcernHint),
+              onTap: () async {
+                final ok = await launchReportConcernEmail(
+                  subject: l10n.reportEmailSubject,
+                );
+                if (!context.mounted || ok) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.reportEmailUnavailable)),
+                );
+              },
+            ),
             const Spacer(),
             PrimaryButton(
               label: l10n.logout,
