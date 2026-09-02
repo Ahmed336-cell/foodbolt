@@ -25,9 +25,9 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
     if (text.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.orderDetailsCopied)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.orderDetailsCopied)));
   }
 
   Future<void> _share(String text) async {
@@ -95,8 +95,10 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
           final submitted = state.allOrders
               .where((o) => o.submitted && o.items.isNotEmpty)
               .toList();
-          final grandTotal =
-              submitted.fold<double>(0, (s, o) => s + o.subtotal);
+          final grandTotal = submitted.fold<double>(
+            0,
+            (s, o) => s + o.subtotal,
+          );
           final ticket = state.allOrders.toRestaurantOrderText(
             restaurantName: restaurant,
             currency: l10n.currency,
@@ -184,7 +186,7 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
                                                         color: line.isShared
                                                             ? AppTheme.primary
                                                             : AppTheme
-                                                                .textPrimary,
+                                                                  .textPrimary,
                                                       ),
                                                     ),
                                                     if (notes != null &&
@@ -300,13 +302,14 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: SecondaryButton(
-                        label: l10n.copyOrder,
+                        label: l10n.copyAllOrders,
                         onPressed: ticket.isEmpty
                             ? null
                             : () => _copy(context, ticket),
@@ -316,8 +319,7 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
                     Expanded(
                       child: SecondaryButton(
                         label: l10n.shareWithRestaurant,
-                        onPressed:
-                            ticket.isEmpty ? null : () => _share(ticket),
+                        onPressed: ticket.isEmpty ? null : () => _share(ticket),
                       ),
                     ),
                   ],
@@ -326,9 +328,9 @@ class RestaurantOrderDetailsScreen extends StatelessWidget {
                 if (isHost)
                   PrimaryButton(
                     label: l10n.continueToReceipt,
-                    onPressed: () => context
-                        .read<RoomCubit>()
-                        .advancePhase(RoomPhase.receipt),
+                    onPressed: () => context.read<RoomCubit>().advancePhase(
+                      RoomPhase.receipt,
+                    ),
                   )
                 else
                   Text(

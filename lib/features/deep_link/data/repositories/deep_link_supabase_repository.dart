@@ -9,13 +9,14 @@ import '../../domain/repositories/deep_link_repository.dart';
 /// Supabase-backed deep links: OS URIs → resolve room via RPC → pending join.
 class DeepLinkSupabaseRepository implements DeepLinkRepository {
   DeepLinkSupabaseRepository({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
   final _controller = StreamController<String?>.broadcast();
   String? _pendingRoomId;
-  late final AppDeepLinkListener _listener =
-      AppDeepLinkListener(_onInviteToken);
+  late final AppDeepLinkListener _listener = AppDeepLinkListener(
+    _onInviteToken,
+  );
 
   @override
   Future<void> startListening() => _listener.start();
@@ -76,13 +77,13 @@ class DeepLinkSupabaseRepository implements DeepLinkRepository {
           .eq('id', roomId)
           .maybeSingle();
 
-      final existing = row?['invite_url'] as String?;
-      if (existing != null && existing.isNotEmpty) {
-        return existing;
-      }
-
       final code = (row?['code'] as String?) ?? roomId;
       final url = InviteLinks.forToken(code);
+      final existing = row?['invite_url'] as String?;
+      if (existing == url && !InviteLinks.isCustomSchemeUrl(existing ?? '')) {
+        return existing!;
+      }
+
       await _client.from('rooms').update({'invite_url': url}).eq('id', roomId);
       return url;
     } catch (_) {

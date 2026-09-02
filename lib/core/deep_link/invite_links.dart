@@ -5,30 +5,32 @@ import '../constants/app_constants.dart';
 ///
 /// Supported forms:
 /// - `foodrush://join/ABC123`
-/// - `https://foodrush.app/join/ABC123`
+/// - `https://ahmed336-cell.github.io/foodbolt/join/ABC123` (GitHub Pages)
 /// - `...?code=ABC123` / `...?roomId=<uuid>`
 class InviteLinks {
   InviteLinks._();
 
+  /// HTTPS base used for shareable links. GitHub Pages serves real HTML with
+  /// no CSP sandboxing — unlike Supabase Edge Functions, which force
+  /// `Content-Type: text/plain` on direct browser navigations for security.
   static String get base {
     final fromEnv = AppEnv.inviteBaseUrl;
-    if (fromEnv.isNotEmpty) return fromEnv.replaceAll(RegExp(r'/+$'), '');
+    if (fromEnv.isNotEmpty) {
+      return fromEnv.replaceAll(RegExp(r'/+$'), '');
+    }
     return AppConstants.inviteBase;
   }
 
   /// Shareable invite URL for a room code (preferred) or id.
   static String forToken(String codeOrId) {
     final token = codeOrId.trim();
-    final b = base;
-    if (b.contains('://')) {
-      // Custom scheme: foodrush://join/{token}
-      if (RegExp(r'^[a-zA-Z][a-zA-Z0-9+.-]*://').hasMatch(b) &&
-          !b.startsWith('http')) {
-        return '$b/${Uri.encodeComponent(token)}';
-      }
-      return '$b/${Uri.encodeComponent(token)}';
-    }
-    return '${AppConstants.inviteScheme}://join/${Uri.encodeComponent(token)}';
+    return '$base/${Uri.encodeComponent(token)}';
+  }
+
+  static bool isCustomSchemeUrl(String value) {
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || !uri.hasScheme) return false;
+    return uri.scheme != 'http' && uri.scheme != 'https';
   }
 
   /// Extract room code or id from an incoming URI, or null if not an invite.

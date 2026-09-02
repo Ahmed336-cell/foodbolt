@@ -20,7 +20,7 @@ class AppEnv {
       dotenv.env['SUPABASE_ANON_KEY']?.trim() ?? '';
   static String get branchKey => dotenv.env['BRANCH_KEY'] ?? '';
 
-  /// Optional override, e.g. `https://foodrush.app/join` or `foodrush://join`.
+  /// Optional HTTPS override, e.g. `https://foodrush.app/join`.
   static String get inviteBaseUrl => dotenv.env['INVITE_BASE_URL'] ?? '';
 
   static bool get hasSupabaseCredentials =>

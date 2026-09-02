@@ -546,6 +546,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addItem => 'إضافة صنف';
 
   @override
+  String get addYourOrderItems => 'أضف أصناف طلبك';
+
+  @override
   String get itemName => 'اسم الصنف';
 
   @override
@@ -589,7 +592,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get yourSubmittedOrder => 'طلبك المُرسل';
 
   @override
-  String get copyOrder => 'نسخ الطلب';
+  String get copyOrder => 'نسخ طلبك';
+
+  @override
+  String get copyAllOrders => 'نسخ كل الطلبات';
 
   @override
   String get orderCopied => 'تم نسخ الطلب';
@@ -734,6 +740,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reviewFinalBill => 'راجع الفاتورة النهائية';
+
+  @override
+  String get calculatingSplit => 'جارٍ حساب نصيبك…';
 
   @override
   String get expectedOrders => 'إجمالي الطلبات المتوقع';
@@ -1051,6 +1060,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errOrdersLocked => 'الطلبات مغلقة.';
+
+  @override
+  String get errRoomLockedCannotJoin => 'لا يمكن الانضمام الآن. الغرفة مغلقة.';
 
   @override
   String get errEnterReceiptTotal => 'أدخل إجمالي الفاتورة.';

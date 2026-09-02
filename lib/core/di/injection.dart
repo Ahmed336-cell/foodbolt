@@ -111,7 +111,9 @@ Future<void> configureDependencies({bool? useMocks}) async {
   }
 
   sl.registerLazySingleton<SettingsRepository>(SettingsPrefsRepository.new);
-  sl.registerLazySingleton<SavedOrdersRepository>(SavedOrdersPrefsRepository.new);
+  sl.registerLazySingleton<SavedOrdersRepository>(
+    SavedOrdersPrefsRepository.new,
+  );
 
   if (mocks) {
     _registerMocks();
@@ -132,11 +134,15 @@ void _registerMocks() {
   sl.registerLazySingleton<VotingRepository>(() => VotingMockRepository(sl()));
   sl.registerLazySingleton<RaceRepository>(() => RaceMockRepository(sl()));
   sl.registerLazySingleton<OrderRepository>(() => OrderMockRepository(sl()));
-  sl.registerLazySingleton<ReceiptRepository>(() => ReceiptMockRepository(sl()));
+  sl.registerLazySingleton<ReceiptRepository>(
+    () => ReceiptMockRepository(sl()),
+  );
   sl.registerLazySingleton<CostSharingRepository>(
     () => CostSharingMockRepository(sl()),
   );
-  sl.registerLazySingleton<PaymentRepository>(() => PaymentMockRepository(sl()));
+  sl.registerLazySingleton<PaymentRepository>(
+    () => PaymentMockRepository(sl()),
+  );
   sl.registerLazySingleton<DeepLinkRepository>(
     () => DeepLinkMockRepository(sl()),
   );
@@ -188,6 +194,7 @@ void _registerUseCasesAndCubits() {
   sl.registerLazySingleton(() => JoinRoom(sl()));
   sl.registerLazySingleton(() => JoinRoomById(sl()));
   sl.registerLazySingleton(() => GetRoom(sl()));
+  sl.registerLazySingleton(() => GetActiveRoom(sl()));
   sl.registerLazySingleton(() => SetRoomPhase(sl()));
   sl.registerLazySingleton(() => SetRoomSelectionMode(sl()));
   sl.registerLazySingleton(() => GetInviteLink(sl()));
@@ -269,11 +276,7 @@ void _registerUseCasesAndCubits() {
     ),
   );
   sl.registerFactory(
-    () => RaceCubit(
-      repository: sl(),
-      prepareRace: sl(),
-      startRace: sl(),
-    ),
+    () => RaceCubit(repository: sl(), prepareRace: sl(), startRace: sl()),
   );
   sl.registerFactory(
     () => OrderCubit(
@@ -286,11 +289,8 @@ void _registerUseCasesAndCubits() {
     ),
   );
   sl.registerFactory(
-    () => ReceiptCubit(
-      repository: sl(),
-      uploadReceipt: sl(),
-      skipReceipt: sl(),
-    ),
+    () =>
+        ReceiptCubit(repository: sl(), uploadReceipt: sl(), skipReceipt: sl()),
   );
   sl.registerFactory(
     () => CostSharingCubit(

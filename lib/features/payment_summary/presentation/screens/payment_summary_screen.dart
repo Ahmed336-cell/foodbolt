@@ -138,7 +138,7 @@ class PaymentSummaryScreen extends StatelessWidget {
                           IconButton(
                             tooltip: l10n.confirmPaid,
                             icon: const Icon(Icons.check_circle_outline),
-                            color: AppTheme.primary,
+                            color: Colors.green,
                             onPressed: state.loading
                                 ? null
                                 : () => context
@@ -148,7 +148,7 @@ class PaymentSummaryScreen extends StatelessWidget {
                         if (p.status != PaymentStatus.unpaid)
                           IconButton(
                             tooltip: l10n.markUnpaid,
-                            icon: const Icon(Icons.undo),
+                            icon: const Icon(Icons.autorenew),
                             onPressed: state.loading
                                 ? null
                                 : () => context

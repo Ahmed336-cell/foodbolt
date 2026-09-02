@@ -9,10 +9,10 @@ class CreateRoom extends UseCase<Room, CreateRoomParams> {
 
   @override
   Future<Result<Room>> call(CreateRoomParams params) => _repo.createRoom(
-        name: params.name,
-        selectionMode: params.selectionMode,
-        settings: params.settings,
-      );
+    name: params.name,
+    selectionMode: params.selectionMode,
+    settings: params.settings,
+  );
 }
 
 class CreateRoomParams {
@@ -49,6 +49,15 @@ class GetRoom extends UseCase<Room, String> {
 
   @override
   Future<Result<Room>> call(String roomId) => _repo.getRoom(roomId);
+}
+
+class GetActiveRoom extends UseCase<Room?, NoParams> {
+  GetActiveRoom(this._repo);
+  final RoomRepository _repo;
+
+  @override
+  Future<Result<Room?>> call(NoParams params) =>
+      _repo.getActiveRoomForCurrentUser();
 }
 
 class SetRoomPhase extends UseCase<Room, SetPhaseParams> {

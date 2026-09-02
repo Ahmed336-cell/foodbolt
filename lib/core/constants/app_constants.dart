@@ -12,9 +12,9 @@ class AppConstants {
   /// Custom URL scheme registered on Android / iOS.
   static const inviteScheme = 'foodrush';
 
-  /// Default invite base (`foodrush://join/{code}`).
-  /// Override with `INVITE_BASE_URL` in `.env` (e.g. https://foodrush.app/join).
-  static const inviteBase = 'foodrush://join';
+  /// Default invite base — hosted free on GitHub Pages (no domain needed).
+  /// Override with `INVITE_BASE_URL` in `.env` if you register a real domain.
+  static const inviteBase = 'https://ahmed336-cell.github.io/foodbolt/join';
 
   @Deprecated('Use InviteLinks.forToken / inviteBase')
   static const mockInviteBase = inviteBase;

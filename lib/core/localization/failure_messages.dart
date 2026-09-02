@@ -50,6 +50,7 @@ class FailureMessages {
       'Host pick is only for vote-only rooms.' => l10n.errHostPickVoteOnly,
       'Pick one of the tied restaurants.' => l10n.errPickTiedRestaurant,
       'Orders are locked.' => l10n.errOrdersLocked,
+      'Room is locked. Cannot join now.' => l10n.errRoomLockedCannotJoin,
       'Enter receipt total.' => l10n.errEnterReceiptTotal,
       'Enter a valid receipt total.' => l10n.errEnterValidReceiptTotal,
       'Select a receipt image first.' => l10n.errSelectReceiptImage,

@@ -172,15 +172,10 @@ class _RestaurantSuggestionScreenState extends State<RestaurantSuggestionScreen>
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.suggestRestaurants)),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _add,
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addRestaurant),
-      ),
       body: BlocBuilder<SuggestionCubit, SuggestionState>(
         builder: (context, state) {
           return AdaptivePadding(
-            bottom: 20,
+            bottom: 40,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -215,11 +210,21 @@ class _RestaurantSuggestionScreenState extends State<RestaurantSuggestionScreen>
                           },
                         ),
                 ),
-                if (isHost)
+                Align(
+                  alignment: isHost ? Alignment.centerRight : Alignment.center,
+                  child: FloatingActionButton.extended(
+                    onPressed: _add,
+                    icon: const Icon(Icons.add),
+                    label: Text(l10n.addRestaurant),
+                  ),
+                ),
+                if (isHost) ...[
+                  const SizedBox(height: 12),
                   PrimaryButton(
                     label: isRace ? l10n.startRace : l10n.startVoting,
                     onPressed: _continue,
                   ),
+                ],
               ],
             ),
           );

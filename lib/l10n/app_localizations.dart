@@ -1106,6 +1106,12 @@ abstract class AppLocalizations {
   /// **'Add item'**
   String get addItem;
 
+  /// No description provided for @addYourOrderItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your order items'**
+  String get addYourOrderItems;
+
   /// No description provided for @itemName.
   ///
   /// In en, this message translates to:
@@ -1193,8 +1199,14 @@ abstract class AppLocalizations {
   /// No description provided for @copyOrder.
   ///
   /// In en, this message translates to:
-  /// **'Copy order'**
+  /// **'Copy your order'**
   String get copyOrder;
+
+  /// No description provided for @copyAllOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy all orders'**
+  String get copyAllOrders;
 
   /// No description provided for @orderCopied.
   ///
@@ -1459,6 +1471,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Review the final bill'**
   String get reviewFinalBill;
+
+  /// No description provided for @calculatingSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating your split…'**
+  String get calculatingSplit;
 
   /// No description provided for @expectedOrders.
   ///
@@ -2047,6 +2065,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Orders are locked.'**
   String get errOrdersLocked;
+
+  /// No description provided for @errRoomLockedCannotJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t join now. Room is locked.'**
+  String get errRoomLockedCannotJoin;
 
   /// No description provided for @errEnterReceiptTotal.
   ///

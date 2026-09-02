@@ -152,22 +152,8 @@ class RoomLobbyScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                  PrimaryButton(
-                    label: l10n.inviteFriends,
-                    onPressed: () async {
-                      final link = await context.read<RoomCubit>().inviteLink();
-                      if (link != null) {
-                        await SharePlus.instance.share(
-                          ShareParams(
-                            text:
-                                '${l10n.inviteMessage(room.name, room.code)}\n$link',
-                          ),
-                        );
-                      }
-                    },
-                  ),
+
                   if (isHost) ...[
-                    const SizedBox(height: 12),
                     PrimaryButton(
                       label: l10n.start,
                       loading: state.loading,
@@ -186,14 +172,46 @@ class RoomLobbyScreen extends StatelessWidget {
                         }
                       },
                     ),
+                    const SizedBox(height: 12),
+
+                    SecondaryButton(
+                      label: l10n.inviteFriends,
+                      onPressed: () async {
+                        final link = await context.read<RoomCubit>().inviteLink();
+                        if (link != null) {
+                          await SharePlus.instance.share(
+                            ShareParams(
+                              text:
+                              '${l10n.inviteMessage(room.name, room.code)}\n$link',
+                            ),
+                          );
+                        }
+                      },
+                    ),
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: state.loading
                           ? null
                           : () => _leaveOrCancel(context, isHost: true),
-                      child: Text(l10n.cancelRoom),
+                      child: Text(l10n.cancelRoom,style: TextStyle(color: AppTheme.textSecondary),),
                     ),
                   ] else ...[
+
+                    PrimaryButton(
+                      label: l10n.inviteFriends,
+                      onPressed: () async {
+                        final link = await context.read<RoomCubit>().inviteLink();
+                        if (link != null) {
+                          await SharePlus.instance.share(
+                            ShareParams(
+                              text:
+                              '${l10n.inviteMessage(room.name, room.code)}\n$link',
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: Text(
@@ -206,7 +224,7 @@ class RoomLobbyScreen extends StatelessWidget {
                       onPressed: state.loading
                           ? null
                           : () => _leaveOrCancel(context, isHost: false),
-                      child: Text(l10n.leaveRoom),
+                      child: Text(l10n.leaveRoom ,style: TextStyle(color: AppTheme.textPrimary),),
                     ),
                   ],
                 ],

@@ -52,7 +52,10 @@ class RoomSupabaseRepository implements RoomRepository {
       final roomId = inserted['id'] as String;
       debugPrint('createRoom OK id=$roomId code=$code');
       final inviteUrl = InviteLinks.forToken(code);
-      await _client.from('rooms').update({'invite_url': inviteUrl}).eq('id', roomId);
+      await _client
+          .from('rooms')
+          .update({'invite_url': inviteUrl})
+          .eq('id', roomId);
 
       await _client.from('room_members').insert({
         'room_id': roomId,
@@ -109,8 +112,11 @@ class RoomSupabaseRepository implements RoomRepository {
       return const Failed(AuthFailure('Sign in to join a room.'));
     }
     try {
-      final row =
-          await _client.from('rooms').select().eq('id', roomId).maybeSingle();
+      final row = await _client
+          .from('rooms')
+          .select()
+          .eq('id', roomId)
+          .maybeSingle();
       if (row == null) {
         return const Failed(NotFoundFailure('Room not found.'));
       }
@@ -152,6 +158,12 @@ class RoomSupabaseRepository implements RoomRepository {
       return Success(room);
     }
 
+    if (room.phase.index >= RoomPhase.ordersLocked.index) {
+      return const Failed(
+        ValidationFailure('Room is locked. Cannot join now.'),
+      );
+    }
+
     final countRes = await _client
         .from('room_members')
         .select('user_id')
@@ -172,10 +184,41 @@ class RoomSupabaseRepository implements RoomRepository {
   @override
   Future<Result<Room>> getRoom(String roomId) async {
     try {
-      final row =
-          await _client.from('rooms').select().eq('id', roomId).maybeSingle();
+      final row = await _client
+          .from('rooms')
+          .select()
+          .eq('id', roomId)
+          .maybeSingle();
       if (row == null) return const Failed(NotFoundFailure('Room not found.'));
       return Success(_mapRoom(row));
+    } catch (e, st) {
+      return Failed(SupabaseMappers.mapError(e, st));
+    }
+  }
+
+  @override
+  Future<Result<Room?>> getActiveRoomForCurrentUser() async {
+    final userId = SupabaseMappers.requireUserId(_client);
+    if (userId == null) return const Failed(AuthFailure());
+
+    try {
+      final rows = await _client
+          .from('room_members')
+          .select('joined_at, rooms(*)')
+          .eq('user_id', userId)
+          .order('joined_at', ascending: false);
+
+      for (final raw in rows as List) {
+        final row = Map<String, dynamic>.from(raw as Map);
+        final roomRaw = row['rooms'];
+        if (roomRaw is! Map) continue;
+        final room = _mapRoom(Map<String, dynamic>.from(roomRaw));
+        if (room.phase != RoomPhase.completed) {
+          return Success(room);
+        }
+      }
+
+      return const Success(null);
     } catch (e, st) {
       return Failed(SupabaseMappers.mapError(e, st));
     }
@@ -243,17 +286,18 @@ class RoomSupabaseRepository implements RoomRepository {
           .maybeSingle();
       if (row == null) return const Failed(NotFoundFailure('Room not found.'));
       final existing = row['invite_url'] as String?;
-      if (existing != null && existing.isNotEmpty) {
-        return Success(existing);
-      }
       final code = (row['code'] as String?) ?? row['id'] as String;
       final url = InviteLinks.forToken(code);
+      if (existing == url && !InviteLinks.isCustomSchemeUrl(existing ?? '')) {
+        return Success(existing!);
+      }
       await _client.from('rooms').update({'invite_url': url}).eq('id', roomId);
       return Success(url);
     } catch (e, st) {
       return Failed(SupabaseMappers.mapError(e, st));
     }
   }
+
 
   @override
   Stream<Room> watchRoom(String roomId) {
@@ -286,10 +330,11 @@ class RoomSupabaseRepository implements RoomRepository {
     }
 
     yield await load();
-    await for (final _ in _client
-        .from('room_members')
-        .stream(primaryKey: ['room_id', 'user_id'])
-        .eq('room_id', roomId)) {
+    await for (final _
+        in _client
+            .from('room_members')
+            .stream(primaryKey: ['room_id', 'user_id'])
+            .eq('room_id', roomId)) {
       yield await load();
     }
   }
@@ -321,8 +366,9 @@ class RoomSupabaseRepository implements RoomRepository {
           .inFilter('id', ids)
           .eq('phase', 'completed')
           .order('created_at', ascending: false);
-      final rooms =
-          (rows as List).map((r) => _mapRoom(Map<String, dynamic>.from(r as Map))).toList();
+      final rooms = (rows as List)
+          .map((r) => _mapRoom(Map<String, dynamic>.from(r as Map)))
+          .toList();
       return Success(rooms);
     } catch (e, st) {
       return Failed(SupabaseMappers.mapError(e, st));
@@ -336,19 +382,23 @@ class RoomSupabaseRepository implements RoomRepository {
       name: row['name'] as String,
       hostId: row['host_id'] as String,
       phase: SupabaseMappers.roomPhaseFromDb(row['phase'] as String?),
-      selectionMode:
-          SupabaseMappers.selectionModeFromDb(row['selection_mode'] as String?),
+      selectionMode: SupabaseMappers.selectionModeFromDb(
+        row['selection_mode'] as String?,
+      ),
       settings: RoomSettings(
         maxParticipants: SupabaseMappers.asInt(row['max_participants'], 12),
-        votingDurationSeconds:
-            SupabaseMappers.asInt(row['voting_duration_seconds'], 60),
+        votingDurationSeconds: SupabaseMappers.asInt(
+          row['voting_duration_seconds'],
+          60,
+        ),
         maxSuggestions: SupabaseMappers.asInt(row['max_suggestions'], 8),
         allowMemberSuggestions:
             row['allow_member_suggestions'] as bool? ?? true,
         guestAccess: row['guest_access'] as bool? ?? true,
         voteLimit: SupabaseMappers.asInt(row['vote_limit'], 1),
       ),
-      createdAt: DateTime.tryParse(row['created_at']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(row['created_at']?.toString() ?? '') ??
           DateTime.now(),
       winnerSuggestionId: row['winner_suggestion_id'] as String?,
       inviteUrl: row['invite_url'] as String?,
@@ -364,10 +414,13 @@ class RoomSupabaseRepository implements RoomRepository {
       userId: row['user_id'] as String,
       displayName: profileMap['display_name'] as String? ?? 'User',
       avatar: AppAvatars.byId(profileMap['avatar'] as String?).id,
-      role: (row['role'] as String?) == 'host' ? MemberRole.host : MemberRole.member,
+      role: (row['role'] as String?) == 'host'
+          ? MemberRole.host
+          : MemberRole.member,
       isGuest: profileMap['is_guest'] as bool? ?? false,
       isOnline: row['is_online'] as bool? ?? true,
-      joinedAt: DateTime.tryParse(row['joined_at']?.toString() ?? '') ??
+      joinedAt:
+          DateTime.tryParse(row['joined_at']?.toString() ?? '') ??
           DateTime.now(),
     );
   }

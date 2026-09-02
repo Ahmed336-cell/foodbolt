@@ -89,11 +89,18 @@ class RoomMockRepository implements RoomRepository {
       return const Failed(ValidationFailure('This room has already ended.'));
     }
     if (!room.settings.guestAccess && user.isGuest) {
-      return const Failed(PermissionFailure('Guests are not allowed in this room.'));
+      return const Failed(
+        PermissionFailure('Guests are not allowed in this room.'),
+      );
     }
     final list = _store.members[room.id] ?? [];
     if (list.any((m) => m.userId == user.id)) {
       return Success(room);
+    }
+    if (room.phase.index >= RoomPhase.ordersLocked.index) {
+      return const Failed(
+        ValidationFailure('Room is locked. Cannot join now.'),
+      );
     }
     if (list.length >= room.settings.maxParticipants) {
       return const Failed(ValidationFailure('Room is full.'));
@@ -117,6 +124,21 @@ class RoomMockRepository implements RoomRepository {
   @override
   Future<Result<Room>> getRoom(String roomId) async {
     return _store.requireRoom(roomId);
+  }
+
+  @override
+  Future<Result<Room?>> getActiveRoomForCurrentUser() async {
+    final userResult = _store.requireUser();
+    if (userResult case Failed(:final failure)) return Failed(failure);
+    final user = userResult.dataOrNull!;
+
+    final rooms = _store.rooms.values.where((room) {
+      if (room.phase == RoomPhase.completed) return false;
+      final members = _store.members[room.id] ?? const <RoomMember>[];
+      return members.any((member) => member.userId == user.id);
+    }).toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return Success(rooms.firstOrNull);
   }
 
   @override
@@ -167,7 +189,11 @@ class RoomMockRepository implements RoomRepository {
     final roomResult = _store.requireRoom(roomId);
     if (roomResult case Failed(:final failure)) return Failed(failure);
     final room = roomResult.dataOrNull!;
-    final url = room.inviteUrl ?? InviteLinks.forToken(room.code);
+    final url =
+        room.inviteUrl != null &&
+            !InviteLinks.isCustomSchemeUrl(room.inviteUrl!)
+        ? room.inviteUrl!
+        : InviteLinks.forToken(room.code);
     return Success(url);
   }
 

@@ -103,7 +103,7 @@ jobs:
             echo "SUPABASE_URL=${SUPABASE_URL}"
             echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}"
             echo "BRANCH_KEY=${BRANCH_KEY:-}"
-            echo "INVITE_BASE_URL=${INVITE_BASE_URL:-https://foodrush.app/join}"
+            echo "INVITE_BASE_URL=${INVITE_BASE_URL:-}"
             echo "USE_MOCKS=${MOCKS}"
           } > assets/env/.env
           test -f assets/env/.env

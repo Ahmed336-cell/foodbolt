@@ -72,11 +72,11 @@ class OrderEntryScreen extends StatelessWidget {
 
     if (ok == true && context.mounted) {
       context.read<OrderCubit>().addDraftItem(
-            name: name.text,
-            quantity: int.tryParse(qty.text) ?? 1,
-            price: double.tryParse(price.text) ?? 0,
-            notes: notes.text.isEmpty ? null : notes.text,
-          );
+        name: name.text,
+        quantity: int.tryParse(qty.text) ?? 1,
+        price: double.tryParse(price.text) ?? 0,
+        notes: notes.text.isEmpty ? null : notes.text,
+      );
     }
   }
 
@@ -86,9 +86,9 @@ class OrderEntryScreen extends StatelessWidget {
     if (text.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.orderCopied)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.orderCopied)));
   }
 
   Future<void> _submit(BuildContext context) async {
@@ -110,6 +110,8 @@ class OrderEntryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final room = context.watch<RoomCubit>().state.room!;
+    final user = context.watch<AuthCubit>().state.user;
+    final isHost = room.hostId == user?.id;
     final winner = context
         .watch<SuggestionCubit>()
         .state
@@ -120,16 +122,6 @@ class OrderEntryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.yourOrder)),
-      floatingActionButton: BlocBuilder<OrderCubit, OrderState>(
-        buildWhen: (a, b) => a.isSubmitted != b.isSubmitted,
-        builder: (context, state) {
-          if (state.isSubmitted) return const SizedBox.shrink();
-          return FloatingActionButton(
-            onPressed: () => _addItem(context),
-            child: const Icon(Icons.add),
-          );
-        },
-      ),
       body: BlocBuilder<OrderCubit, OrderState>(
         builder: (context, state) {
           final items = state.displayItems;
@@ -186,23 +178,47 @@ class OrderEntryScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                 ],
                 Expanded(
-                  child: items.isEmpty
-                      ? EmptyStateView(message: l10n.noItemsYet)
-                      : ListView.separated(
-                          itemCount: items.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 8),
-                          itemBuilder: (context, i) {
-                            final item = items[i];
-                            return _OrderItemTile(
+                  child: ListView(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    children: [
+                      if (items.isEmpty)
+                        EmptyStateView(message: l10n.noItemsYet)
+                      else
+                        ...items.map(
+                          (item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: _OrderItemTile(
                               item: item,
                               readOnly: state.isSubmitted,
                               onRemove: () => context
                                   .read<OrderCubit>()
                                   .removeDraftItem(item.id),
-                            );
-                          },
+                            ),
+                          ),
                         ),
+                      const SizedBox(height: 16),
+                      _GroupOrdersList(
+                        state: state,
+                        members: context
+                            .watch<RoomCubit>()
+                            .state
+                            .members
+                            .length,
+                      ),
+                    ],
+                  ),
                 ),
+                if (!state.isSubmitted) ...[
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FloatingActionButton.extended(
+                      onPressed: () => _addItem(context),
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.addYourOrderItems),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -246,27 +262,26 @@ class OrderEntryScreen extends StatelessWidget {
                     loading: state.loading,
                     onPressed: () => _submit(context),
                   ),
-                const SizedBox(height: 8),
-                SecondaryButton(
-                  label: l10n.viewGroupOrders,
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (_) => MultiBlocProvider(
-                        providers: [
-                          BlocProvider.value(value: context.read<OrderCubit>()),
-                          BlocProvider.value(value: context.read<RoomCubit>()),
-                          BlocProvider.value(value: context.read<AuthCubit>()),
-                        ],
-                        child: const SizedBox(
-                          height: 520,
-                          child: _MiniGroupOrders(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                if (isHost) ...[
+                  const SizedBox(height: 8),
+                  SecondaryButton(
+                    label: l10n.lockOrders,
+                    onPressed: state.loading
+                        ? null
+                        : () async {
+                            final ok = await showAppConfirmDialog(
+                              context,
+                              title: l10n.lockOrdersQuestion,
+                              message: l10n.lockOrdersBody,
+                              confirmLabel: l10n.lock,
+                              icon: Icons.lock_outline_rounded,
+                            );
+                            if (ok == true && context.mounted) {
+                              await context.read<OrderCubit>().lock();
+                            }
+                          },
+                  ),
+                ],
               ],
             ),
           );
@@ -304,68 +319,74 @@ class _OrderItemTile extends StatelessWidget {
         children: [
           MoneyText(item.lineTotal),
           if (!readOnly)
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: onRemove,
-            ),
+            IconButton(icon: const Icon(Icons.close), onPressed: onRemove),
         ],
       ),
     );
   }
 }
 
-class _MiniGroupOrders extends StatelessWidget {
-  const _MiniGroupOrders();
+class _GroupOrdersList extends StatelessWidget {
+  const _GroupOrdersList({required this.state, required this.members});
+
+  final OrderState state;
+  final int members;
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<OrderCubit>().state;
-    final room = context.watch<RoomCubit>().state.room!;
-    final members = context.watch<RoomCubit>().state.members.length;
-    final isHost = room.hostId == context.watch<AuthCubit>().state.user?.id;
     final l10n = context.l10n;
-    return AdaptivePadding(
+    final orders = [...state.allOrders]
+      ..sort((a, b) {
+        if (a.submitted != b.submitted) return a.submitted ? -1 : 1;
+        return a.displayName.compareTo(b.displayName);
+      });
+
+    return Card(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SectionPrompt(
-            text: l10n.ordersSubmitted(state.submittedCount, members),
-          ),
-          Expanded(
-            child: ListView(
-              children: state.allOrders
-                  .map(
-                    (o) => ListTile(
-                      title: Text(o.displayName),
-                      subtitle: Text(
-                        o.submitted
-                            ? o.items
-                                .map((i) => '${i.name} ×${i.quantity}')
-                                .join(', ')
-                            : l10n.notSubmitted,
-                      ),
-                      trailing: MoneyText(o.subtotal),
-                    ),
-                  )
-                  .toList(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.groupOrders,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.ordersSubmitted(state.submittedCount, members),
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
             ),
           ),
-          if (isHost)
-            PrimaryButton(
-              label: l10n.lockOrders,
-              loading: state.loading,
-              onPressed: () async {
-                final ok = await showAppConfirmDialog(
-                  context,
-                  title: l10n.lockOrdersQuestion,
-                  message: l10n.lockOrdersBody,
-                  confirmLabel: l10n.lock,
-                  icon: Icons.lock_outline_rounded,
-                );
-                if (ok == true && context.mounted) {
-                  Navigator.pop(context);
-                  await context.read<OrderCubit>().lock();
-                }
-              },
+          if (orders.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: Text(
+                l10n.notSubmitted,
+                style: const TextStyle(color: AppTheme.textSecondary),
+              ),
+            )
+          else
+            ...orders.map(
+              (o) => ListTile(
+                dense: true,
+                title: Text(o.displayName),
+                subtitle: Text(
+                  o.submitted
+                      ? o.items
+                            .map((i) => '${i.name} ×${i.quantity}')
+                            .join(', ')
+                      : l10n.notSubmitted,
+                ),
+                trailing: MoneyText(o.subtotal),
+              ),
             ),
         ],
       ),

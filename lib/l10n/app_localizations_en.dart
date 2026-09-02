@@ -549,6 +549,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addItem => 'Add item';
 
   @override
+  String get addYourOrderItems => 'Add your order items';
+
+  @override
   String get itemName => 'Item name';
 
   @override
@@ -592,7 +595,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourSubmittedOrder => 'Your submitted order';
 
   @override
-  String get copyOrder => 'Copy order';
+  String get copyOrder => 'Copy your order';
+
+  @override
+  String get copyAllOrders => 'Copy all orders';
 
   @override
   String get orderCopied => 'Order copied';
@@ -737,6 +743,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewFinalBill => 'Review the final bill';
+
+  @override
+  String get calculatingSplit => 'Calculating your split…';
 
   @override
   String get expectedOrders => 'Expected orders';
@@ -1058,6 +1067,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errOrdersLocked => 'Orders are locked.';
+
+  @override
+  String get errRoomLockedCannotJoin => 'Can\'t join now. Room is locked.';
 
   @override
   String get errEnterReceiptTotal => 'Enter receipt total.';
