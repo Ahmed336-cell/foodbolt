@@ -63,15 +63,11 @@ class RoomLobbyScreen extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.share),
                   onPressed: () async {
-                    final link = await context.read<RoomCubit>().inviteLink();
-                    if (link != null) {
-                      await SharePlus.instance.share(
-                        ShareParams(
-                          text:
-                              '${l10n.inviteMessage(room.name, room.code)}\n$link',
-                        ),
-                      );
-                    }
+                    await SharePlus.instance.share(
+                      ShareParams(
+                        text: l10n.inviteMessage(room.name, room.code),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -177,15 +173,11 @@ class RoomLobbyScreen extends StatelessWidget {
                     SecondaryButton(
                       label: l10n.inviteFriends,
                       onPressed: () async {
-                        final link = await context.read<RoomCubit>().inviteLink();
-                        if (link != null) {
-                          await SharePlus.instance.share(
-                            ShareParams(
-                              text:
-                              '${l10n.inviteMessage(room.name, room.code)}\n$link',
-                            ),
-                          );
-                        }
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            text: l10n.inviteMessage(room.name, room.code),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 8),
@@ -200,15 +192,11 @@ class RoomLobbyScreen extends StatelessWidget {
                     PrimaryButton(
                       label: l10n.inviteFriends,
                       onPressed: () async {
-                        final link = await context.read<RoomCubit>().inviteLink();
-                        if (link != null) {
-                          await SharePlus.instance.share(
-                            ShareParams(
-                              text:
-                              '${l10n.inviteMessage(room.name, room.code)}\n$link',
-                            ),
-                          );
-                        }
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            text: l10n.inviteMessage(room.name, room.code),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 12),
