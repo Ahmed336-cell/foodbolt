@@ -42,11 +42,21 @@ class AdIds {
     final envKey = Platform.isIOS ? 'ADMOB_BANNER_IOS' : 'ADMOB_BANNER_ANDROID';
     final fromEnv = dotenv.env[envKey]?.trim();
     if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+    // Only Flutter debug → Google sample units. Profile + release → production.
     if (kDebugMode) {
       return Platform.isIOS ? _testBannerIos : _testBannerAndroid;
     }
     return Platform.isIOS ? productionBannerIos : productionBannerAndroid;
   }
+
+  /// True when current banner unit is a Google sample (not FoodRush production).
+  static bool get isUsingSampleBanner {
+    final id = banner;
+    return id == _testBannerAndroid || id == _testBannerIos;
+  }
+
+  static String get modeLabel =>
+      kDebugMode ? 'debug' : (kReleaseMode ? 'release' : 'profile');
 
   static String get interstitial {
     if (kIsWeb) return _testInterstitialAndroid;

@@ -33,7 +33,11 @@ class AdsService {
     try {
       // No short timeout — SDK often needs >8s on cold release start.
       await MobileAds.instance.initialize();
-      debugPrint('Ads: SDK initialized (banner=${AdIds.banner})');
+      debugPrint(
+        'Ads: SDK ready mode=${AdIds.modeLabel} '
+        'sample=${AdIds.isUsingSampleBanner} '
+        'banner=${AdIds.banner}',
+      );
     } catch (e) {
       debugPrint('Ads init error: $e');
     } finally {
