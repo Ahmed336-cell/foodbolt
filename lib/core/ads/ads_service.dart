@@ -17,19 +17,32 @@ class AdsService {
   var _initialized = false;
   var _loadingInterstitial = false;
   var _showingInterstitial = false;
+  Completer<void>? _initCompleter;
 
   bool get isReady => _initialized;
 
   Future<void> initialize() async {
-    if (_initialized || kIsWeb) return;
-    try {
-      await MobileAds.instance
-          .initialize()
-          .timeout(const Duration(seconds: 8));
+    if (kIsWeb) {
       _initialized = true;
-      unawaited(preloadInterstitial());
+      return;
+    }
+    if (_initialized) return;
+    if (_initCompleter != null) return _initCompleter!.future;
+
+    _initCompleter = Completer<void>();
+    try {
+      // No short timeout — SDK often needs >8s on cold release start.
+      await MobileAds.instance.initialize();
+      debugPrint('Ads: SDK initialized (banner=${AdIds.banner})');
     } catch (e) {
-      debugPrint('Ads init failed: $e');
+      debugPrint('Ads init error: $e');
+    } finally {
+      // Allow load attempts even if init was flaky.
+      _initialized = true;
+      if (!(_initCompleter?.isCompleted ?? true)) {
+        _initCompleter!.complete();
+      }
+      unawaited(preloadInterstitial());
     }
   }
 

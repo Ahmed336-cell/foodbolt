@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -23,26 +25,42 @@ class AdBanner extends StatefulWidget {
 class _AdBannerState extends State<AdBanner> {
   BannerAd? _ad;
   var _loaded = false;
+  var _loading = false;
+  var _retries = 0;
+  var _useFallbackSize = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Need MediaQuery width for adaptive size — load once.
-    if (_ad == null) {
-      _load();
+    if (_ad == null && !_loading && !_loaded) {
+      unawaited(_load());
     }
   }
 
   Future<void> _load() async {
-    if (kIsWeb) return;
-    if (!AdsService.instance.isReady) {
-      await AdsService.instance.initialize();
-    }
-    if (!mounted || !AdsService.instance.isReady) return;
+    if (kIsWeb || _loading || !mounted) return;
+    _loading = true;
 
-    final width = MediaQuery.sizeOf(context).width.truncate();
-    final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
-    if (size == null || !mounted) return;
+    await AdsService.instance.initialize();
+    if (!mounted || !AdsService.instance.isReady) {
+      _loading = false;
+      return;
+    }
+
+    final AdSize size;
+    if (_useFallbackSize) {
+      size = AdSize.banner;
+    } else {
+      final width = MediaQuery.sizeOf(context).width.truncate();
+      final adaptive =
+          await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
+      size = adaptive ?? AdSize.banner;
+    }
+
+    if (!mounted) {
+      _loading = false;
+      return;
+    }
 
     final ad = BannerAd(
       adUnitId: AdIds.banner,
@@ -50,15 +68,27 @@ class _AdBannerState extends State<AdBanner> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
+          _loading = false;
           if (mounted) setState(() => _loaded = true);
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Banner failed: $error');
+          debugPrint(
+            'Banner failed (${AdIds.banner}): $error',
+          );
           ad.dispose();
-          if (mounted) {
-            setState(() {
-              _ad = null;
-              _loaded = false;
+          _loading = false;
+          if (!mounted) return;
+          setState(() {
+            _ad = null;
+            _loaded = false;
+          });
+
+          // code 3 = NO_FILL — retry later; try smaller size once.
+          if (_retries < 3) {
+            _retries++;
+            if (error.code == 3) _useFallbackSize = true;
+            Future<void>.delayed(Duration(seconds: 8 * _retries), () {
+              if (mounted && !_loaded) unawaited(_load());
             });
           }
         },

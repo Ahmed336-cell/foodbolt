@@ -51,6 +51,11 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // AGP 9 + AdMob: keep WorkManager DB ctor (R8 strips it otherwise).
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
@@ -63,6 +68,12 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+// AdMob pulls old work-runtime; AGP 9 R8 crashes without this bump.
+// https://github.com/googleads/googleads-mobile-flutter/issues/1444
+dependencies {
+    implementation("androidx.work:work-runtime:2.11.2")
 }
 
 fun File.stripIntegrationTestPluginFromRegistrant() {
