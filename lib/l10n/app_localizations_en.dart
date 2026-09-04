@@ -1097,4 +1097,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String errSharesMustEqual(String shares, String receipt) {
     return 'Shares ($shares) must equal receipt ($receipt).';
   }
+
+  @override
+  String get noInternetTitle => 'No internet connection';
+
+  @override
+  String get noInternetBody =>
+      'FoodRush needs internet to work. Turn on Wi‑Fi or mobile data, then try again.';
+
+  @override
+  String get retryConnection => 'Try again';
 }

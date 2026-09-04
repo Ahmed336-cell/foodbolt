@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/ads_service.dart';
 import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/deep_link/invite_links.dart';
 import '../../../../core/di/injection.dart';
@@ -46,6 +49,8 @@ class _RoomSessionScreenState extends State<RoomSessionScreen> {
   late final ReceiptCubit _receiptCubit = sl<ReceiptCubit>();
   late final CostSharingCubit _costCubit = sl<CostSharingCubit>();
   late final PaymentSummaryCubit _paymentCubit = sl<PaymentSummaryCubit>();
+  RoomPhase? _lastPhase;
+  var _showedFinishAd = false;
 
   @override
   void initState() {
@@ -112,6 +117,15 @@ class _RoomSessionScreenState extends State<RoomSessionScreen> {
             );
             context.read<RoomCubit>().clearToast();
           }
+          final phase = state.room?.phase;
+          if (phase == RoomPhase.completed &&
+              _lastPhase != null &&
+              _lastPhase != RoomPhase.completed &&
+              !_showedFinishAd) {
+            _showedFinishAd = true;
+            unawaited(AdsService.instance.showRoomFinishedAd());
+          }
+          if (phase != null) _lastPhase = phase;
         },
         builder: (context, state) {
           if (state.loading && state.room == null) {

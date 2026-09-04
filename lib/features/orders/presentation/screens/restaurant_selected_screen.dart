@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/phase/room_phase.dart';
@@ -29,6 +30,7 @@ class RestaurantSelectedScreen extends StatelessWidget {
     final l10n = context.l10n;
 
     return Scaffold(
+      bottomNavigationBar: const AdBanner(),
       body: SafeArea(
         child: AdaptivePadding(
           top: 8,

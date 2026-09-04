@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/food_categories.dart';
 import '../../../../core/localization/l10n_extension.dart';
@@ -172,6 +173,7 @@ class _RestaurantSuggestionScreenState extends State<RestaurantSuggestionScreen>
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.suggestRestaurants)),
+      bottomNavigationBar: const AdBanner(),
       body: BlocBuilder<SuggestionCubit, SuggestionState>(
         builder: (context, state) {
           return AdaptivePadding(

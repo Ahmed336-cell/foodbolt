@@ -1089,4 +1089,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String errSharesMustEqual(String shares, String receipt) {
     return 'الحصص ($shares) يجب أن تساوي الفاتورة ($receipt).';
   }
+
+  @override
+  String get noInternetTitle => 'لا يوجد اتصال بالإنترنت';
+
+  @override
+  String get noInternetBody =>
+      'تطبيق FoodRush يحتاج إنترنت للعمل. فعّل الواي فاي أو بيانات الجوال ثم حاول مرة أخرى.';
+
+  @override
+  String get retryConnection => 'إعادة المحاولة';
 }

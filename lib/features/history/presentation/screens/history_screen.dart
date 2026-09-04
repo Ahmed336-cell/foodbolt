@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/widgets/app_page.dart';
@@ -18,6 +19,7 @@ class HistoryScreen extends StatelessWidget {
       create: (_) => sl<HistoryCubit>()..load(),
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.historyTitle)),
+        bottomNavigationBar: const AdBanner(),
         body: BlocBuilder<HistoryCubit, HistoryState>(
           builder: (context, state) {
             if (state.loading) {

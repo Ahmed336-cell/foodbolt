@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/config/env.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/localization/l10n_extension.dart';
@@ -326,6 +327,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
+          bottomNavigationBar: const AdBanner(),
         ),
         if (showGuide)
           CoachMarksOverlay(

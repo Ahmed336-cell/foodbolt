@@ -2119,6 +2119,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shares ({shares}) must equal receipt ({receipt}).'**
   String errSharesMustEqual(String shares, String receipt);
+
+  /// No description provided for @noInternetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get noInternetTitle;
+
+  /// No description provided for @noInternetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'FoodRush needs internet to work. Turn on Wi‑Fi or mobile data, then try again.'**
+  String get noInternetBody;
+
+  /// No description provided for @retryConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get retryConnection;
 }
 
 class _AppLocalizationsDelegate

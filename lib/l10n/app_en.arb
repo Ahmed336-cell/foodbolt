@@ -392,5 +392,8 @@
       "shares": { "type": "String" },
       "receipt": { "type": "String" }
     }
-  }
+  },
+  "noInternetTitle": "No internet connection",
+  "noInternetBody": "FoodRush needs internet to work. Turn on Wi‑Fi or mobile data, then try again.",
+  "retryConnection": "Try again"
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/localization/failure_messages.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/support/report_concern.dart';
@@ -50,6 +51,7 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.profile)),
+      bottomNavigationBar: const AdBanner(),
       body: AdaptivePadding(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

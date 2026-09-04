@@ -392,5 +392,8 @@
       "shares": { "type": "String" },
       "receipt": { "type": "String" }
     }
-  }
+  },
+  "noInternetTitle": "لا يوجد اتصال بالإنترنت",
+  "noInternetBody": "تطبيق FoodRush يحتاج إنترنت للعمل. فعّل الواي فاي أو بيانات الجوال ثم حاول مرة أخرى.",
+  "retryConnection": "إعادة المحاولة"
 }

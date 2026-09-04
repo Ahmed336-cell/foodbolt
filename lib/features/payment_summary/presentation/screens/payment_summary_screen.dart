@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -38,6 +39,7 @@ class PaymentSummaryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.paymentSummary)),
+      bottomNavigationBar: const AdBanner(),
       body: BlocBuilder<PaymentSummaryCubit, PaymentSummaryState>(
         builder: (context, state) {
           final mine =
@@ -202,6 +204,7 @@ class RoomSummaryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(room.name)),
+      bottomNavigationBar: const AdBanner(),
       body: AdaptivePadding(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

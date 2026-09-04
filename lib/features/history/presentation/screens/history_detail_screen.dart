@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -33,6 +34,7 @@ class _HistoryDetailView extends StatelessWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyDetailTitle)),
+      bottomNavigationBar: const AdBanner(),
       body: BlocBuilder<HistoryDetailCubit, HistoryDetailState>(
         builder: (context, state) {
           if (state.loading) {

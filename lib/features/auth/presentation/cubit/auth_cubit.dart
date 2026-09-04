@@ -81,18 +81,25 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> checkSession() async {
     emit(state.copyWith(loading: true, clearError: true));
-    final result = await _getCurrentUser(const NoParams());
-    result.fold(
-      (f) => emit(state.copyWith(loading: false, error: f.message, initialized: true)),
-      (user) => emit(
-        state.copyWith(
-          user: user,
-          clearUser: user == null,
-          loading: false,
-          initialized: true,
+    try {
+      final result = await _getCurrentUser(const NoParams())
+          .timeout(const Duration(seconds: 8));
+      result.fold(
+        (f) => emit(
+          state.copyWith(loading: false, error: f.message, initialized: true),
         ),
-      ),
-    );
+        (user) => emit(
+          state.copyWith(
+            user: user,
+            clearUser: user == null,
+            loading: false,
+            initialized: true,
+          ),
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(loading: false, initialized: true));
+    }
   }
 
   Future<bool> login(String email, String password) async {

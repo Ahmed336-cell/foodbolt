@@ -264,7 +264,7 @@ class OrderEntryScreen extends StatelessWidget {
                   ),
                 if (isHost) ...[
                   const SizedBox(height: 8),
-                  SecondaryButton(
+                  PrimaryButton(
                     label: l10n.lockOrders,
                     onPressed: state.loading
                         ? null

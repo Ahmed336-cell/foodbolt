@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/auth/guest_exit.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -218,6 +219,7 @@ class RoomLobbyScreen extends StatelessWidget {
                 ],
               ),
             ),
+            bottomNavigationBar: const AdBanner(),
           ),
         );
       },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/ad_banner.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/localization/l10n_extension.dart';
 import '../../../../core/widgets/app_page.dart';
@@ -25,6 +26,7 @@ class CostSharingReviewScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.costSharing)),
+      bottomNavigationBar: const AdBanner(),
       body: BlocBuilder<CostSharingCubit, CostSharingState>(
         builder: (context, state) {
           final draft = state.draft;
