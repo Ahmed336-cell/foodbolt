@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Account activated — FoodRush</title>
+  <meta name="description" content="Your FoodRush account email was confirmed.">
+  <style>
+    :root {
+      --orange: #e85d04;
+      --orange-soft: #f48c06;
+      --cream: #fff8f0;
+      --navy: #141830;
+      --muted: #6b6b6b;
+      --ok: #2d6a4f;
+      --danger: #c1121f;
+      --border: #ead9c8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(160deg, #ffe8d6 0%, var(--cream) 45%, #fff 100%);
+      color: var(--navy);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 48px 20px 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      justify-content: center;
+    }
+    .brand .mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #111;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .brand h1 { margin: 0; font-size: 1.35rem; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 12px 40px rgba(232, 93, 4, 0.08);
+      text-align: center;
+    }
+    .icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      font-size: 32px;
+      font-weight: 800;
+    }
+    .icon.ok { background: #e7f5ef; color: var(--ok); }
+    .icon.err { background: #fde8e8; color: var(--danger); }
+    h2 { margin: 0 0 8px; font-size: 1.35rem; }
+    .lead { color: var(--muted); margin: 0 0 8px; }
+    .detail {
+      margin: 12px 0 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #fde8e8;
+      color: #7a1212;
+      font-size: 0.9rem;
+      display: none;
+      text-align: start;
+    }
+    .detail.show { display: block; }
+    .hint {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #fff3e6;
+      color: #7a3e00;
+      font-size: 0.95rem;
+    }
+    .ar {
+      direction: rtl;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+    .ar .lead { margin-bottom: 0; }
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--orange); }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">FR</div>
+      <div>
+        <h1>FoodRush</h1>
+        <p>Decide. Race. Order. Split.</p>
+      </div>
+    </div>
+
+    <div class="card" id="okCard">
+      <div class="icon ok" aria-hidden="true">✓</div>
+      <h2>Account activated</h2>
+      <p class="lead">Your email is confirmed. Open the FoodRush app and sign in.</p>
+      <div class="hint">You can close this tab.</div>
+      <div class="ar">
+        <h2>تم تفعيل الحساب</h2>
+        <p class="lead">تم تأكيد بريدك. افتح تطبيق FoodRush وسجّل الدخول.</p>
+      </div>
+    </div>
+
+    <div class="card hidden" id="errCard">
+      <div class="icon err" aria-hidden="true">!</div>
+      <h2>Activation failed</h2>
+      <p class="lead">This link is invalid or expired. Request a new confirmation email from the app.</p>
+      <p class="detail" id="errDetail"></p>
+      <div class="ar">
+        <h2>فشل التفعيل</h2>
+        <p class="lead">الرابط غير صالح أو منتهي. اطلب رسالة تأكيد جديدة من التطبيق.</p>
+      </div>
+    </div>
+
+    <footer>
+      <a href="index.html">FoodRush</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      function paramsFrom(str) {
+        const out = {};
+        if (!str) return out;
+        new URLSearchParams(str).forEach((v, k) => { out[k] = v; });
+        return out;
+      }
+
+      const hash = window.location.hash.startsWith('#')
+        ? window.location.hash.slice(1)
+        : window.location.hash;
+      const q = paramsFrom(window.location.search.startsWith('?')
+        ? window.location.search.slice(1)
+        : window.location.search);
+      const h = paramsFrom(hash);
+      const error = q.error || h.error;
+      const desc = q.error_description || h.error_description;
+
+      if (error) {
+        document.getElementById('okCard').classList.add('hidden');
+        document.getElementById('errCard').classList.remove('hidden');
+        if (desc) {
+          const el = document.getElementById('errDetail');
+          el.textContent = decodeURIComponent(desc.replace(/\+/g, ' '));
+          el.classList.add('show');
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
